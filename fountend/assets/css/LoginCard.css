@@ -1,0 +1,229 @@
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 400px;
+    /* margin: 0 auto; Removed to rely on flex centering */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #333;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.logo {
+    height: 60px;
+    /* Adjust based on actual logo aspect ratio */
+    width: auto;
+    display: block;
+    margin: 0 auto 16px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    /* Ensure padding doesn't affect width */
+}
+
+.form-input:focus {
+    border-color: #C1A96C;
+    box-shadow: 0 0 0 3px rgba(193, 169, 108, 0.1);
+}
+
+.form-input::placeholder {
+    color: #999;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember-me input[type="checkbox"] {
+    accent-color: #C1A96C;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-password:hover {
+    color: #C1A96C;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #C1A96C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.submit-btn:hover {
+    background-color: #b0985c;
+}
+
+.submit-btn:active {
+    transform: scale(0.99);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+    color: #999;
+    font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.divider span {
+    padding: 0 10px;
+}
+
+.register-section {
+    text-align: center;
+    font-size: 15px;
+}
+
+.text {
+    color: #666;
+    margin-right: 6px;
+}
+
+.register-link {
+    color: #C1A96C;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.register-link:hover {
+    color: #b0985c;
+    text-decoration: underline;
+}
+/* 🔥 新增：錯誤訊息樣式 */
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background-color: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  border-radius: 8px;
+  color: #991B1B;
+  font-size: 14px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🔥 新增：載入按鈕樣式 */
+.btn-loading {
+  opacity: 0.7;
+  cursor: not-allowed !important;
+}
+
+/* 🔥 新增：載入動畫 */
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 停用輸入框樣式 */
+.form-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
