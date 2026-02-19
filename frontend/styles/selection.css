@@ -1,0 +1,203 @@
+/* Selection Section - Light Green Theme */
+.selection_section {
+    position: relative;
+    width: 100%;
+    /* Light Green Gradient */
+    background: linear-gradient(to bottom, #f1f8e9, #dcedc8);
+    padding: 60px 0;
+    overflow: hidden;
+    color: #5d4037;
+    /* Dark Brown for contrast */
+    font-family: "Zen Maru Gothic", sans-serif;
+}
+
+.selection_container {
+    max-width: 1400px;
+    /* Wider for 2 cols */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    /* Stretch to partition height */
+    position: relative;
+    padding: 0 20px;
+}
+
+/* Column Layout */
+.selection_col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    position: relative;
+}
+
+/* Vertical Divider */
+.selection_divider {
+    width: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 20px 0;
+    border-radius: 2px;
+}
+
+/* Headers */
+.selection_header {
+    font-size: 1.8rem;
+    color: #5d4037;
+    /* Dark Brown */
+    margin-bottom: 20px;
+    font-weight: 900;
+    text-shadow: none;
+    /* Remove shadow for cleaner look on light bg */
+    border-bottom: 2px solid rgba(93, 64, 55, 0.2);
+    /* Darker border */
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+/* Top: Display Area */
+.selection_display {
+    width: 100%;
+    height: 400px;
+    /* Slightly smaller height */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.display_img {
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    /* Float animation provided via JS or CSS class if needed, keeping it simple for transitions */
+}
+
+/* Floating animation class */
+.animate_float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.display_info {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.85);
+    /* Lighter bg */
+    backdrop-filter: blur(5px);
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: 1px solid rgba(93, 64, 55, 0.1);
+    width: max-content;
+    max-width: 90%;
+    box-shadow: 0 10px 20px rgba(93, 64, 55, 0.15);
+}
+
+.display_title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #5d4037;
+    /* Dark Brown */
+    line-height: 1.2;
+}
+
+.display_desc {
+    font-size: 1rem;
+    color: #8d6e63;
+    /* Softer Brown */
+    margin: 0;
+}
+
+/* Bottom: Button Buttons (5 each) */
+.selection_choices_row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+}
+
+.choice_btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    background: #fff;
+    /* White bg */
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(93, 64, 55, 0.1);
+}
+
+.choice_btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.choice_btn:hover {
+    transform: translateY(-5px);
+    border-color: #dcb15c;
+    /* Gold border on hover */
+    box-shadow: 0 8px 15px rgba(93, 64, 55, 0.2);
+}
+
+.choice_btn.active {
+    border-color: #ffd700;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.choice_btn:hover img,
+.choice_btn.active img {
+    transform: scale(1.1);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .selection_container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .selection_divider {
+        width: 80%;
+        height: 2px;
+        margin: 40px 0;
+    }
+
+    .display_img {
+        max-height: 250px;
+    }
+
+    .selection_display {
+        height: 300px;
+    }
+}

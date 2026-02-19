@@ -1,0 +1,284 @@
+/* ==========================================
+   🔥 新增：載入動畫樣式
+   ========================================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #C1A96C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   原本的樣式
+   ========================================== */
+.member-page-container {
+  background-color: #f9f9f9;
+  min-height: calc(100vh - 200px);
+  padding: 40px 0;
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 32px;
+}
+
+.dashboard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ==========================================
+   🔥 修改：Banner 樣式（加上登出按鈕）
+   ========================================== */
+.member-banner {
+  background: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%);
+  color: white;
+  padding: 32px 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.banner-info {
+  flex: 1;
+}
+
+.level-badge {
+  display: inline-block;
+  background-color: #C1A96C;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.welcome-text {
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.join-date {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+/* 🔥 新增：登出按鈕樣式 */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.logout-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================
+   Grid System
+   ========================================== */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.more-link {
+  font-size: 13px;
+  color: #999;
+  text-decoration: none;
+}
+
+.more-link:hover {
+  color: #C1A96C;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ==========================================
+   Specific Card Styles
+   ========================================== */
+.order-status-highlight {
+  color: #C1A96C;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.order-details p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.order-total {
+  font-weight: 600;
+  color: #333 !important;
+  margin-top: 8px !important;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.info-row .label {
+  color: #999;
+}
+
+.info-row .value {
+  color: #333;
+  font-weight: 500;
+}
+
+.action-btn {
+  margin-top: auto;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #555;
+  font-size: 14px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.action-btn:hover {
+  border-color: #C1A96C;
+  color: #C1A96C;
+}
+
+.login-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.login-location {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.security-tip {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0;
+}
+
+/* ==========================================
+   🔥 修改：RWD（登出按鈕在手機版會換行）
+   ========================================== */
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+    padding: 0 16px;
+  }
+  
+  .member-page-container {
+    padding: 20px 0;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .member-banner {
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .logout-btn {
+    align-self: flex-end;
+  }
+
+  .welcome-text {
+    font-size: 24px;
+  }
+}

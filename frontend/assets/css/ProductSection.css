@@ -1,0 +1,265 @@
+/* Product Grid Section - Purple Theme with Gold Accents */
+.product_section {
+    padding: 180px 0 80px;
+    margin-top: -100px;
+    /* Overlap with previous section */
+    /* Felt Paper Texture */
+    background-color: #fdfbf7;
+    /* Warm white base */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+    position: relative;
+    z-index: 0;
+}
+
+.product_title_area {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.product_title_area h3 {
+    font-size: 32px;
+    color: #5d4037;
+    /* Brown (Matching Intro) */
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.product_title_area p {
+    color: #8d6e63;
+    /* Softer Brown */
+    font-size: 16px;
+}
+
+.product_container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 120px;
+}
+
+.product_carousel_wrap {
+    position: relative;
+    padding: 0 50px;
+    /* Space for arrows */
+}
+
+/* Navigation Buttons */
+.product_nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #dcb15c;
+    color: #dcb15c;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: all 0.3s;
+}
+
+.product_nav:hover {
+    background-color: #dcb15c;
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(220, 177, 92, 0.4);
+}
+
+.product_prev {
+    left: -10px;
+}
+
+.product_next {
+    right: -10px;
+}
+
+/* Ensure cards take full height in carousel */
+.product_carousel .item {
+    padding: 10px;
+    /* Visual spacing for shadow */
+    height: 100%;
+}
+
+/* Product Card Styling */
+.product_card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 10px 20px rgba(74, 20, 140, 0.05);
+    /* Slight purple shadow */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    border: 1px solid rgba(123, 31, 162, 0.1);
+    /* Faint purple border */
+    container-type: inline-size;
+}
+
+.product_card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(74, 20, 140, 0.15);
+    border-color: rgba(123, 31, 162, 0.3);
+}
+
+.card_img_wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+    /* 4:3 Aspect Ratio */
+    overflow: hidden;
+    background-color: #f3e5f5;
+    /* Light purple bg placeholder */
+}
+
+.card_img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.product_card:hover .card_img {
+    transform: scale(1.1);
+}
+
+/* Tag/Badge - GOLD as requested */
+.card_tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #dcb15c;
+    /* Gold */
+    color: #fff;
+    padding: 4px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card_content {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card_title {
+    font-size: 18px;
+    /* Fallback */
+    font-size: clamp(15px, 6cqi, 18px);
+    /* Responsive size */
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+    text-align: center;
+}
+
+.product_card:hover .card_title {
+    color: #5d4037;
+    /* Brown on hover */
+}
+
+
+
+.card_desc {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    /* Pushes price/button to bottom */
+}
+
+.card_bottom {
+    border-top: 1px solid #f3e5f5;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card_price {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: #5d4037;
+    /* Price in Brown */
+    font-weight: bold;
+}
+
+.card_price small {
+    font-size: 12px;
+    font-weight: normal;
+    color: #888;
+}
+
+/* Button - GOLD as requested */
+.btn_card_action {
+    background-color: transparent;
+    border: 1px solid #dcb15c;
+    /* Gold border */
+    color: #dcb15c;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn_card_action:hover {
+    background-color: #dcb15c;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(220, 177, 92, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .product_container {
+        padding: 0 50px;
+    }
+
+    .product_grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .product_container {
+        padding: 0 20px;
+    }
+
+    .product_nav {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .product_prev {
+        left: -5px;
+    }
+
+    .product_next {
+        right: -5px;
+    }
+
+    .product_title_area h3 {
+        font-size: 24px;
+    }
+
+}

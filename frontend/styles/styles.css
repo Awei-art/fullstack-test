@@ -1,0 +1,774 @@
+/* Reset & Base */
+@font-face {
+    font-family: 'NaikaiFont';
+    src: url('https://cdn.jsdelivr.net/gh/max32002/naikaifont@web/webfont/NaikaiFont-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+    background-color: #fcfcfc;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Header Variables */
+:root {
+    --grape-primary: #6f2da8;
+    /* Purple */
+    --grape-secondary: #8bc34a;
+    /* Green */
+    --grape-dark: #4a1a75;
+    --grape-light: #f3e5f5;
+    --grape-bg-light: #fbf6ff;
+    /* New very light purple */
+    --text-color: #333;
+    --header-height: 80px;
+}
+
+.mobile_menu_logo_item {
+    display: none;
+    /* Hidden on desktop */
+}
+
+/* Header Styles */
+.header_wrap {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(111, 45, 168, 0.1);
+    /* Subtle purple shadow */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    border-bottom: 1px solid rgba(111, 45, 168, 0.1);
+}
+
+/* Header */
+.header {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Changed from space-between to group logo and nav */
+    padding: 0 30px;
+}
+
+
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    margin-right: 60px;
+    /* Space between Logo and Nav */
+}
+
+/* ... existing styles ... */
+
+/* Utils / Login */
+.util_wrap {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    /* Push to the far right */
+}
+
+.logo a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Space between icon and text logo */
+    height: 35px;
+    /* Adjust based on actual logo aspect ratio */
+}
+
+.logo img {
+    height: 100%;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Specific adjustment for the icon if needed, though height constraint on parent handles it */
+.logo_icon {
+    height: 100%;
+    /* Match parent height */
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.header_menu_wrap {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+.menu_link {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+    position: relative;
+    padding: 10px 0;
+    transition: color 0.3s ease;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    /* Prevent text wrapping */
+}
+
+.menu_link:hover {
+    color: var(--grape-primary);
+}
+
+.menu_link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    /*隱藏*/
+    height: 3px;
+    background: linear-gradient(90deg, var(--grape-primary), var(--grape-secondary));
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.menu_link:hover::after {
+    width: 100%;
+}
+
+/* --- Submenu Styles --- */
+.submenu {
+    display: none;
+    /* Default hidden */
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    min-width: 150px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px 0;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.submenu li {
+    display: block;
+    width: 100%;
+}
+
+.submenu .menu_link {
+    padding: 10px 20px;
+    display: block;
+    color: #333;
+    font-size: 15px;
+    text-align: center;
+}
+
+.submenu .menu_link:hover {
+    background: rgba(111, 45, 168, 0.05);
+    color: var(--grape-primary);
+}
+
+.submenu .menu_link::after {
+    display: none;
+    /* Remove underline animation for submenu items */
+}
+
+/* Desktop Hover Interaction */
+@media (min-width: 901px) {
+    .node1 {
+        position: relative;
+        /* Anchor for absolute submenu */
+    }
+
+    .has_submenu:hover .submenu {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        margin-top: 10px;
+        /* Slight offset animation */
+    }
+
+    /* Connect bridge to prevent mouse-leave when moving to submenu */
+    .has_submenu::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+    }
+}
+
+/* Utils / Login */
+.util_wrap {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Space between cart and login */
+}
+
+.btn_cart {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--grape-primary);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.btn_cart:hover {
+    background-color: rgba(111, 45, 168, 0.05);
+    transform: scale(1.1);
+}
+
+.btn_cart svg {
+    width: 28px;
+    /* Slightly larger icon */
+    height: 28px;
+}
+
+.btn_login {
+    padding: 10px 24px;
+    /* Slightly reduced padding */
+    /* border: 2px solid var(--grape-primary);  <-- Removed to fix gap */
+    box-shadow: inset 0 0 0 2px var(--grape-primary);
+    /* Use inset shadow as border */
+    border: none;
+    border-radius: 30px;
+    background: transparent;
+    color: var(--grape-primary);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    white-space: nowrap;
+    /* Prevent text wrapping */
+}
+
+.btn_login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: var(--grape-primary);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+.btn_login:hover {
+    color: #fff;
+    box-shadow: inset 0 0 0 2px var(--grape-primary), 0 4px 15px rgba(111, 45, 168, 0.3);
+}
+
+.btn_login:hover::before {
+    width: 100%;
+}
+
+/* Mobile Menu Button */
+.btn_all_menu {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.hamburger-lines {
+    width: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hamburger-lines .line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--grape-primary);
+    border-radius: 3px;
+    transition: all 0.3s;
+}
+
+/* Icon styles - Default Hidden on Desktop */
+.icon_user {
+    display: none;
+    width: 24px;
+    height: 24px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+
+    /* Header Layout Reordering */
+    .header {
+        position: relative;
+        justify-content: center;
+        /* Center logo by default, needed for absolute logic to make sense visually */
+        padding: 0 10px;
+    }
+
+    /* 1. Hamburger Menu - Absolute Left */
+    .btn_all_menu {
+        display: block;
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        order: 1;
+        z-index: 1001;
+    }
+
+    /* 2. Logo - Center */
+    .logo {
+        margin: 0;
+        z-index: 900;
+        position: relative;
+        /* Center is handled by flex justify-content center on parent */
+    }
+
+    /* Increase Logo Size on Mobile */
+    .logo a {
+        height: 35px;
+        /* Increased from default 35px */
+    }
+
+    /* 3. Login Button (Util Wrap) - Absolute Right */
+    .util_wrap {
+        display: flex;
+        position: absolute;
+        right: 0px;
+        /* Align strictly to right edge */
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        width: auto;
+        padding: 0;
+        gap: 0px;
+        /* Remove gap */
+        z-index: 900;
+    }
+
+    .btn_cart {
+        padding: 5px;
+        width: 40px;
+        height: 40px;
+        margin-right: -3px;
+        /* Pull cart closer to login/right edge overlap */
+    }
+
+    .btn_cart svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Transform Login Button to Icon */
+    .btn_login {
+        padding: 5px;
+        border: none;
+        box-shadow: none;
+        /* Remove glow on mobile */
+        border-radius: 50%;
+        /* Circle */
+        width: 40px;
+        height: 40px;
+        min-width: unset;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+    }
+
+    .btn_login:hover {
+        box-shadow: none;
+        /* No glow on hover on mobile */
+        background: rgba(111, 45, 168, 0.05);
+        /* Subtle bg on touch */
+    }
+
+    .btn_login .btn_text {
+        display: none;
+        /* Hide text */
+    }
+
+    .btn_login .icon_user {
+        display: block;
+        /* Show Icon */
+        stroke: var(--grape-primary);
+    }
+
+    /* Disable the sliding background fill animation on mobile */
+    .btn_login::before {
+        display: none;
+    }
+
+    /* -- Menu Dropdown Logic (Converted to Side Drawer) -- */
+
+    .header_menu_wrap {
+        display: none;
+        flex-direction: column;
+        width: 70vw;
+        /* Approx 2/3 of screen width */
+        height: 100vh;
+        /* Radial Gradient: White glow at top, fading to light purple */
+        background: radial-gradient(circle at top, #ffffff 0%, #fcfaff 40%, #f3e5f5 100%);
+        padding: 40px 0 20px 0;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        gap: 0;
+        border-top: none;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    /* Override JS style injection if needed for background */
+    .header_menu_wrap[style*="display: flex"] {
+        background: radial-gradient(circle at top, #ffffff 0%, #fcfaff 40%, #f3e5f5 100%);
+    }
+
+    /* ... existing styles ... */
+
+    /* Toggle Icons */
+    .header.mobile-menu-open .hamburger-lines {
+        display: none;
+    }
+
+    .icon_close {
+        display: none;
+        width: 30px;
+        height: 30px;
+        position: relative;
+    }
+
+    .header.mobile-menu-open .icon_close {
+        display: block;
+        /* Position adjustment: slightly top-left */
+        transform: translate(-10px, -10px);
+    }
+
+    .icon_close .line {
+        display: block;
+        width: 100%;
+        height: 3px;
+        background: var(--grape-primary);
+        border-radius: 3px;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform-origin: center;
+    }
+
+    .icon_close .line:first-child {
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .icon_close .line:last-child {
+        transform: translateY(-50%) rotate(-45deg);
+    }
+
+    .header_menu_wrap .node1 {
+        width: 100%;
+        text-align: left;
+        /* Align text to left */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        /* Darkened separator */
+    }
+
+    /* Add top border for the first menu item (Latest News) */
+    .header_menu_wrap .node1:nth-child(2) {
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile_menu_logo_item {
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .mobile_menu_logo_item img {
+        width: 180px;
+        /* Moderate size */
+        height: auto;
+    }
+
+    .header_menu_wrap .menu_link {
+        display: block;
+        padding: 15px 30px;
+        /* Add horizontal padding (30px left/right) */
+        width: 100%;
+        position: relative;
+    }
+
+    /* Submenu Arrow Indicator */
+    /* Submenu Arrow Indicator */
+    .has_submenu>.menu_link::after {
+        content: '';
+        border: solid #999;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 0;
+        /* Remove padding hack */
+        width: 8px;
+        /* Explicit small size */
+        height: 8px;
+        /* Explicit small size */
+        transform: rotate(45deg);
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        margin-top: -5px;
+        /* Adjust center (half of diagonal approx) */
+        transition: transform 0.3s;
+        background: none;
+        border-radius: 0;
+        left: auto;
+        /* Ensure left is unset */
+    }
+
+    /* When open, rotate arrow */
+    .has_submenu.open>.menu_link::after {
+        transform: rotate(-135deg);
+        margin-top: 0;
+    }
+
+    /* Mobile Submenu Reset */
+    .submenu {
+        position: static;
+        transform: none;
+        width: 100%;
+        box-shadow: none;
+        background: rgba(0, 0, 0, 0.02);
+        /* Slight bg darken */
+        display: none;
+        /* Hidden by default */
+        opacity: 1;
+        visibility: visible;
+        padding: 0;
+        transition: none;
+        /* JS handles sliding usually or just toggle */
+    }
+
+    .has_submenu.open .submenu {
+        display: block;
+        /* JS toggles this class on parent LI */
+    }
+
+    .submenu .menu_link {
+        padding: 12px 0 12px 50px;
+        /* Deep indentation */
+        text-align: left;
+        font-size: 15px;
+        color: #666;
+    }
+
+    /* When menu is open */
+    .header.mobile-menu-open .header_menu_wrap {
+        display: flex;
+        /* Override none */
+        animation: slideInLeft 0.3s ease forwards;
+    }
+
+    /* Refined Mobile Styles for 'Open' State injected via JS override fix */
+    .header_menu_wrap[style*="display: flex"] {
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 70vw;
+        /* Approx 2/3 of screen width */
+        height: 100vh;
+        background: radial-gradient(circle at top, #ffffff 0%, #fcfaff 40%, #f3e5f5 100%) !important;
+        /* Radial Gradient forced */
+        /* Consistent gradient */
+        padding: 40px 0 20px 0;
+        z-index: 1000;
+        /* Ensure this overrides */
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Backdrop Overlay */
+    .header.mobile-menu-open::after {
+        content: '';
+        position: fixed;
+        /* Use 100vh/100vw to force full screen coverage even if container is smaller */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        /* Black 50% opacity */
+        z-index: 999;
+        /* Below menu (1000) but above everything else (900) */
+        animation: fadeIn 0.3s ease forwards;
+        pointer-events: auto;
+        /* Block clicks */
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* 優惠列設定 */
+.sale_event_banner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 30;
+    overflow: hidden;
+    box-sizing: border-box;
+    /* background: url('../images/sale_banner_bg_v2.svg?v=3') no-repeat center center;  <-- Moved to ::after */
+    /* background-size: cover; */
+    min-height: 50px;
+}
+
+.sale_event_banner .sale_link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 17px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+}
+
+.sale_event_banner .sale_link p {
+    margin: 0;
+}
+
+.sale_event_banner .sale_link .txt_yellow {
+    color: #ffc871;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Background Opacity Layer */
+.sale_event_banner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/sale_banner_bg_tech_grey.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.95;
+    /* Slight Transparency */
+    z-index: 0;
+}
+
+/* Glow Effect */
+.sale_event_banner::before {
+    content: '';
+    position: absolute;
+    top: 95%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sale_event_banner .sale_link {
+    position: relative;
+    z-index: 2;
+}
+
+.sale_event_banner .btn_go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    padding: 2px 8px;
+    /* Pill shape */
+    background: #6332eb;
+    color: #fff;
+    font-size: 11px;
+    /* Small text */
+    font-weight: 800;
+    /* Bold */
+    border-radius: 10px;
+    /* Rounded pill */
+    box-shadow: 0 0 5px rgba(99, 50, 235, 0.5);
+    /* Tech glow */
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    font-family: 'Verdana', sans-serif;
+    /* Tech-like sans-serif */
+}
+
+.sale_event_banner:hover .btn_go {
+    background: #8b6aff;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(139, 106, 255, 0.6);
+}
+
+@media (max-width: 1024px) {
+
+
+    .sale_event_banner .sale_link {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}
