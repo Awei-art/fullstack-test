@@ -21,6 +21,7 @@ backend/db.sqlite3
 backend/staticfiles/
 backend/media/
 backend/*.log
+backend/*.sql
 
 # Virtual Environment
 venv/
