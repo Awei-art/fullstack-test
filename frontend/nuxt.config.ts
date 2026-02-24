@@ -20,8 +20,11 @@ export default defineNuxtConfig({
   },
   // API 設定
   runtimeConfig: {
+    // 伺服器端 SSR 用（Docker 容器內部網路）
+    apiBase: 'http://backend:8000/api',
     public: {
-      apiBase: 'http://127.0.0.1:8000/api'  // Django 後端網址
+      // 瀏覽器端用（使用者的本機）
+      apiBase: 'http://localhost:8000/api'
     }
   },
 })

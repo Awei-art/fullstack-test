@@ -6,11 +6,12 @@ import 'swiper/css/navigation'
 
 // 1. 設定後端 API
 const config = useRuntimeConfig()
-const API_BASE = 'http://127.0.0.1:8000/api' // 確保這是您的 Django 位址
 
-// 2. 抓取資料
-const { data: rawProducts, pending } = await useFetch(`${API_BASE}/products/`, {
-    default: () => []
+// 2. 抓取資料（改為客戶端載入，避免 SSR 等待雲端 DB 回應）
+const { data: rawProducts, pending } = useFetch(`${config.public.apiBase}/products/`, {
+    default: () => [],
+    server: false,  // 不在伺服器端執行，頁面先出來再載入資料
+    lazy: true,
 })
 
 // 3. 過濾資料：只顯示有庫存 (stock > 0) 的商品

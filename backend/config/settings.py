@@ -92,6 +92,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),       # Docker 會透過環境變數注入
         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),      # Docker 內會指向 'db' 服務
         'PORT': os.environ.get('DB_PORT', '3306'),
+        'CONN_MAX_AGE': 600,  # 連線保持 10 分鐘（避免每次請求都重新連雲端 DB）
     }
 }
 
