@@ -22,11 +22,11 @@ services:
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
     ports:
-      - "3307:3306"  # 使用 3307 避免與本機 MySQL 衝突
+      - "3307:3306" # 使用 3307 避免與本機 MySQL 衝突
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-***REMOVED_DB_PASSWORD***}"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-***REMOVED_DB_PASSWORD***}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,7 +88,7 @@ services:
   # ==========================================
   frontend:
     build:
-      context: ./fountend
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: grape_shop_frontend
     restart: unless-stopped

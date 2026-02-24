@@ -4,12 +4,13 @@ import { Navigation} from 'swiper/modules' // 加了 Autoplay 讓首頁更生動
 import 'swiper/css'
 import 'swiper/css/navigation'
 
-// 1. 設定後端 API
+// 1. 設定後端 API 網址
 const config = useRuntimeConfig()
-const API_BASE = 'http://127.0.0.1:8000/api' // 確保這是您的 Django 位址
+const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient
 
 // 2. 抓取資料
-const { data: rawProducts, pending } = await useFetch(`${API_BASE}/products/`, {
+const { data: rawProducts, pending } = await useFetch('/products/', {
+    baseURL: baseURL,
     default: () => []
 })
 

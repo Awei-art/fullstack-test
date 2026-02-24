@@ -1,11 +1,12 @@
 <script setup>
-// 1. 設定後端 API 網址 (開發時通常是 localhost:8000)
+// 1. 設定後端 API 網址
 const config = useRuntimeConfig()
-const API_BASE = 'http://127.0.0.1:8000/api' 
+// 關鍵：如果是伺服器端抓資料用內部網址，如果是瀏覽器端抓資料用外部網址
+const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient
 
-// 2. 使用 Nuxt 的 useFetch 抓取資料
-// data 重新命名為 products，並給予預設值 []
-const { data: products, pending, error } = await useFetch(`${API_BASE}/products/`, {
+// 2. 抓取資料
+const { data: products, pending, error } = await useFetch('/products/', {
+  baseURL: baseURL,
   default: () => []
 })
 

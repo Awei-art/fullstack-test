@@ -2,9 +2,14 @@
 import { ref, computed, watchEffect, reactive } from 'vue'
 
 const route = useRoute()
-// 1. 呼叫後端 API
-// 請確保網址對應到您的 Django API
-const { data: product, pending } = await useFetch(`http://127.0.0.1:8000/api/products/${route.params.id}/`)
+// 1. 設定後端 API 網址
+const config = useRuntimeConfig()
+const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient
+
+// 2. 呼叫後端 API
+const { data: product, pending } = await useFetch(`/products/${route.params.id}/`, {
+  baseURL: baseURL
+})
 
 // ==========================================
 // 圖片處理邏輯

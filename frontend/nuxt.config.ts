@@ -11,9 +11,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        { 
-          rel: 'stylesheet', 
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' 
+        {
+          rel: 'stylesheet',
+          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
         }
       ]
     }
@@ -21,8 +21,11 @@ export default defineNuxtConfig({
   // API 設定
   runtimeConfig: {
     public: {
-      apiBase: 'http://127.0.0.1:8000/api'  // Django 後端網址
+      // 伺服器端 (Docker) 連後端容器
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://backend:8000/api',
+      // 客戶端 (瀏覽器) 連 localhost
+      apiBaseClient: 'http://localhost:8000/api'
     }
-  },
+  }
 })
 
