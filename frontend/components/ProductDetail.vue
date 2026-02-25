@@ -1,6 +1,16 @@
 <script setup>
 import { ref, computed, watchEffect, reactive } from 'vue'
 
+// ==========================================
+// 購物車邏輯
+// ==========================================
+// 1. 引入剛剛寫好的 store
+import { useCartStore } from '@/stores/cart'
+
+// 2. 初始化 store
+const cartStore = useCartStore()
+// ==========================================
+
 const route = useRoute()
 // 1. 設定後端 API 網址
 const config = useRuntimeConfig()
@@ -59,44 +69,51 @@ const selectedVarieties = ref([])
 // 2. 🔥 點擊邏輯改變：從「替換」改成「切換 (Toggle)」
 // 這裡可以傳入 maxLimit 參數限制最多選幾種 (例如雙色禮盒 maxLimit = 2)
 const toggleVariety = (variety) => {
-  // A. 檢查是否已選
+  const limit = product.value.mix_limit || 1
   const index = selectedVarieties.value.findIndex(item => item.id === variety.id)
 
+  if (limit === 1) {
+    // 單品種模式：切換時直接替換，且點擊已選中的不動作 (達成無法取消選擇)
+    if (index === -1) {
+      selectedVarieties.value = [variety]
+    }
+    return
+  }
+
+  // 多品種模式 (mix_limit > 1)：正常 Toggle
   if (index > -1) {
-    // 移除 (永遠允許)
     selectedVarieties.value.splice(index, 1)
   } else {
-    // B. 加入前，先讀取後端給的上限 (如果後端沒給，預設為 1)
-    const limit = product.value.mix_limit || 1
-    
-    if (selectedVarieties.value.length >= limit) {
-      return 
+    if (selectedVarieties.value.length < limit) {
+      selectedVarieties.value.push(variety)
     }
-    
-    // 加入陣列
-    selectedVarieties.value.push(variety)
   }
 }
 
-// 3. 🔥 防呆監聽邏輯改變：確保「已選名單」裡的品種都是活著的
+// 3. 🔥 預設與防呆監聽：當產品資料載入或變動時執行
 watchEffect(() => {
-  // 確認產品存在、是混合禮盒、且有品種列表
-  if (product.value?.is_mixed && product.value?.varieties?.length > 0) {
+  // 確認產品存在且有品種列表
+  if (product.value && product.value.varieties && product.value.varieties.length > 0) {
+    const limit = product.value.mix_limit || 1
     
-    // 取得目前後端回傳「有貨且有效」的所有 ID 列表
-    const validIds = product.value.varieties.map(v => v.id)
+    // A. 🔥 預設選擇邏輯：
+    // 如果是「單品種禮盒 (limit=1)」，幫他預選第一個；
+    // 如果是「多品種禮盒 (limit>1)」，則不預選 (length === 0)
+    if (selectedVarieties.value.length === 0 && limit === 1) {
+      selectedVarieties.value = [product.value.varieties[0]]
+      return 
+    }
 
-    // 過濾：只保留那些「ID 還在有效列表內」的品種
-    // (如果原本選了 A, B，結果後台把 B 關掉，這裡就會自動把 B 踢除，只剩 A)
+    // B. 資料效度檢查：確保「已選名單」裡的品種都是活著的
+    const validIds = product.value.varieties.map(v => v.id)
     const newSelection = selectedVarieties.value.filter(selected => validIds.includes(selected.id))
 
-    // 如果過濾後的長度跟原本不一樣，代表有品種失效了，更新列表
     if (newSelection.length !== selectedVarieties.value.length) {
       selectedVarieties.value = newSelection
     }
 
   } else {
-    // 如果不是混合禮盒或是沒貨了，清空所有選擇
+    // 如果沒有資料，清空選擇
     selectedVarieties.value = []
   }
 })
@@ -234,18 +251,86 @@ const toggleAccordion = (key) => {
 }
 
 // ==========================================
-// 購物車按鈕 (暫時功能)
+// 購物車按鈕
 // ==========================================
-const addToCart = () => {
-    if(!product.value) return
-    alert(`已加入購物車：${product.value.name} x ${quantity.value}`)
-    // 這裡之後可以串接 Pinia 或 Vuex 購物車狀態
+// 加入 skipOpen 參數，用來判斷是否需要跳過開啟右側購物車的動作 (例如點擊立即購買時)
+const addToCart = (skipOpen = false) => {
+  // 防呆：如果售完或未選滿品種就不執行
+  const limit = product.value?.mix_limit || 1
+  if (isSoldOut.value || selectedVarieties.value.length < limit) return
+
+
+  // 🔥 解決圖片路徑問題：如果是 /media 開頭，補上後端 API 網址
+  const backendUrl = 'http://127.0.0.1:8000'
+  let safeImage = product.value.image || '/images/default-grape.png'
+  if (safeImage.startsWith('/media')) {
+    safeImage = backendUrl + safeImage
+  }
+  // 1. 整理要存進購物車的資料
+  const cartItem = {
+    id: product.value.id,
+    name: product.value.name,
+    image: safeImage, // 存圖片路徑，購物車頁面要顯示
+    
+    // 價格：如果有分等級，要存等級的價錢
+    price: currentGrade.value ? currentGrade.value.price : product.value.price,
+    
+    // 數量
+    quantity: quantity.value,
+
+    // 規格資訊 (存下來是為了在購物車頁面顯示給客人看)
+    gradeId: currentGrade.value ? currentGrade.value.id : null,
+    gradeName: currentGrade.value ? currentGrade.value.name : null,
+    
+    // 品種：把選中的品種陣列存起來
+    varieties: selectedVarieties.value ? selectedVarieties.value.map(v => ({ id: v.id, name: v.name })) : [],
+    
+    // 最大庫存限制 (讓購物車頁面也能檢查庫存)
+    maxStock: displayStock.value 
+  }
+
+  // 2. 呼叫 Store 的動作 (如果 skipOpen 為 true，那就代表是立即購買，連同 Alert 也一併關閉)
+  const success = cartStore.addToCart(cartItem, skipOpen)
+
+  // 3. 只有成功加入時，且沒有被要求 skipOpen，才會彈出小購物車
+  if (success && !skipOpen) {
+    cartStore.openMiniCart()
+  }
+  
+  // 回傳是否加入成功（給 buyNow 判斷用）
+  return success
 }
+
+// ... (立即購買的邏輯) ...
+const buyNow = () => {
+    cartStore.closeMiniCart() // 先確保沒打開小購物車
+    const added = addToCart(true) // 嘗試加購物車，傳入 true 表示跳過彈出視窗與警示
+    
+    if (added) {
+      navigateTo('/cart') // 加入成功，跳轉去大結帳頁
+    } else {
+      // 加入失敗 (通常是因為已經達庫存上限)，即使 silent=true，我們也可選擇在這裡直接跳轉讓消費者在結帳頁看到數量
+      navigateTo('/cart') 
+    }
+}
+
+// 麵包屑導覽列
+const breadcrumbs = computed(() => {
+  if (!product.value) return []
+  return [
+    { name: '首頁', path: '/' },
+    { name: '葡萄商店', path: '/products' },
+    { name: product.value.name }
+  ]
+})
 
 </script>
 
 <template>
   <section class="product_detail_section">
+    <!-- 麵包屑導覽列 -->
+    <AppBreadcrumb v-if="product" :items="breadcrumbs" />
+
     <div class="product_detail_container" v-if="product">
       
       <div class="detail_gallery">
@@ -366,16 +451,21 @@ const addToCart = () => {
         <div class="action_buttons">
           <button 
             class="add_to_cart_btn" 
-            @click="addToCart" 
-            :disabled="isSoldOut || displayStock === 0" 
-            :class="{ 'btn-disabled': isSoldOut || displayStock === 0}"
+            @click="() => addToCart(false)" 
+            :disabled="isSoldOut || displayStock === 0 || selectedVarieties.length < (product.mix_limit || 1)" 
+            :class="{ 'btn-disabled': isSoldOut || displayStock === 0 || selectedVarieties.length < (product.mix_limit || 1)}"
             >   
-            {{ (isSoldOut || displayStock === 0) ? '已售完' : '加入購物車' }}
+            <template v-if="isSoldOut || displayStock === 0">已售完</template>
+            <template v-else-if="selectedVarieties.length < (product.mix_limit || 1)">
+              請選擇 {{ product.mix_limit || 1 }} 種品種
+            </template>
+            <template v-else>加入購物車</template>
             </button>
           <button 
-            v-if="!isSoldOut && displayStock > 0"
             class="buy_now_btn" 
             @click="buyNow"
+            :disabled="isSoldOut || displayStock === 0 || selectedVarieties.length < (product.mix_limit || 1)"
+            :class="{ 'btn-disabled': isSoldOut || displayStock === 0 || selectedVarieties.length < (product.mix_limit || 1)}"
           >
             立即購買
           </button>

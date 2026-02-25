@@ -12,7 +12,7 @@ definePageMeta({
     
     <SaleBanner />
     <IntroSection />
-    <NewsSection />
+    <Bulletin />
     <ProductSection />
     <SelectionSection />
     <ComparisonSection />

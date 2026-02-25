@@ -27,8 +27,10 @@ const handleLogin = async () => {
   errorMessage.value = '';
 
   try {
-    // 🔥 修改：使用 config 的 API 網址，並改成 /token/ (JWT 登入端點)
-    const { data, error } = await useFetch(`${config.public.apiBase}/token/`, {
+    // 使用 config 的 API 網址，並改成 /token/ (JWT 登入端點)
+    const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase;
+    const { data, error } = await useFetch('/token/', {
+      baseURL: baseURL,
       method: 'POST',
       body: {
         username: form.account,   // Django 預設用 username

@@ -75,8 +75,10 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - ./backend:/app
       - backend_media:/app/media
       - backend_static:/app/staticfiles
+    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       db:
         condition: service_healthy
@@ -90,12 +92,19 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: builder
     container_name: grape_shop_frontend
     restart: unless-stopped
     environment:
       - NUXT_PUBLIC_API_BASE=http://backend:8000/api
+      - WATCHPACK_POLLING=true
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.nuxt
+    command: npm run dev -- --host 0.0.0.0
     depends_on:
       - backend
     networks:

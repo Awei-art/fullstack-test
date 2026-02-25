@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  modules: [
+    '@pinia/nuxt', // 👈 加上這一行
+  ],
   css: [
     '~/assets/css/header.css',
     '~/assets/css/footer.css',
@@ -22,7 +25,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       // 伺服器端 (Docker) 連後端容器
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://backend:8000/api',
+      apiBase: 'http://backend:8000/api',
       // 客戶端 (瀏覽器) 連 localhost
       apiBaseClient: 'http://localhost:8000/api'
     }

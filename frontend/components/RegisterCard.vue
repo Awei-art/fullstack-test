@@ -42,7 +42,10 @@ const handleRegister = async () => {
     isLoading.value = true;
 
     // 3. 發送註冊請求給 Django
-    const { data, error } = await useFetch(`${config.public.apiBase}/register/`, {
+    // 這裡使用 /register/ 並指定 baseURL，以便在 client/server 之間正確切換
+    const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase;
+    const { data, error } = await useFetch('/register/', {
+      baseURL: baseURL,
       method: 'POST',
       body: {
         username: form.username,

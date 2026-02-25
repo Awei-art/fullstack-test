@@ -1,4 +1,8 @@
 <script setup>
+import { useCartStore } from '@/stores/cart'
+
+const cartStore = useCartStore()
+
 // 1. 設定後端 API 網址
 const config = useRuntimeConfig()
 // 關鍵：如果是伺服器端抓資料用內部網址，如果是瀏覽器端抓資料用外部網址
@@ -57,6 +61,56 @@ const checkSoldOut = (product) => {
   // 🟢 兩關都過了，才代表真的有貨
   return false;
 }
+
+// 5. 加入購物車功能 (無縫接軌 ProductDetail)
+const addToCart = (product) => {
+  if (checkSoldOut(product)) return
+
+  // 🔥 解決圖片路徑問題
+  const backendUrl = 'http://127.0.0.1:8000'
+  let safeImage = product.image || '/images/default-grape.png'
+  if (safeImage.startsWith('/media')) {
+    safeImage = backendUrl + safeImage
+  }
+
+  // 嘗試取得預設等級 (如果有的話)
+  let currentGrade = null
+  let displayStock = product.stock
+  if (product.grades && product.grades.length > 0) {
+    // 找一個有庫存的等級
+    currentGrade = product.grades.find(g => g.stock > 0) || product.grades[0]
+    displayStock = currentGrade.stock
+  }
+
+  // 嘗試預設選擇品種 (滿足 mix_limit 需求)
+  let selectedVarieties = []
+  const limit = product.mix_limit || 1
+  if (product.varieties && product.varieties.length > 0) {
+    // 直選前 N 個有庫存活著的品種來湊數
+    selectedVarieties = product.varieties.slice(0, limit)
+  }
+
+  // 整理要存進購物車的資料
+  const cartItem = {
+    id: product.id,
+    name: product.name,
+    image: safeImage,
+    price: currentGrade ? currentGrade.price : product.price,
+    quantity: 1, // 列表頁一律每次加 1
+    gradeId: currentGrade ? currentGrade.id : null,
+    gradeName: currentGrade ? currentGrade.name : null,
+    varieties: selectedVarieties.map(v => ({ id: v.id, name: v.name })),
+    maxStock: displayStock 
+  }
+
+  // 呼叫 Store 的動作
+  const success = cartStore.addToCart(cartItem)
+
+  // 只有成功加入時，才會彈出小購物車
+  if (success) {
+    cartStore.openMiniCart()
+  }
+}
 </script>
 
 <template>
@@ -110,6 +164,7 @@ const checkSoldOut = (product) => {
                 class="btn_add_cart" 
                 :disabled="checkSoldOut(product)"
                 :class="{ 'btn-disabled': checkSoldOut(product) }"
+                @click.prevent="addToCart(product)"
               >
                 <i class="fas fa-cart-plus"></i> 
               </button>

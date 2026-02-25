@@ -41,7 +41,7 @@ const toggleNews = (index) => {
             <!-- Left Side: News List -->
             <div class="news_container">
                 <div class="news_header">
-                    <h3>最新消息 <span class="en_title">What's New</span></h3>
+                    <h3>快訊 <span class="en_title">Bulletin</span></h3>
                 </div>
                 <div class="news_list">
                     <div 
@@ -92,4 +92,4 @@ const toggleNews = (index) => {
 }
 </style>
 
-<style src="@/assets/css/NewsSection.css" scoped></style>
+<style src="@/assets/css/Bulletin.css" scoped></style>

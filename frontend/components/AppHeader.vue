@@ -1,5 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useCartStore } from '@/stores/cart'
+import MiniCart from '@/components/MiniCart.vue'
+
+const cartStore = useCartStore()
+const cartTotalQty = computed(() => cartStore.totalQty)
+
+const openMiniCart = (e) => {
+    e.preventDefault()
+    cartStore.openMiniCart()
+}
 
 const isMenuOpen = ref(false)
 const headerRef = ref(null)
@@ -74,12 +84,14 @@ onUnmounted(() => {
             </nav>
 
             <div class="util_wrap">
-                <NuxtLink to="/cart" class="btn_cart">
+                <a href="#" class="btn_cart" @click.prevent="openMiniCart">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path
                             d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
                     </svg>
-                </NuxtLink>
+                    <!-- 數量標籤 -->
+                    <span v-if="cartTotalQty > 0" class="cart_badge">{{ cartTotalQty }}</span>
+                </a>
                 <NuxtLink to="/login" class="btn_login">
                     <span class="btn_text">登入</span>
                     <svg class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
@@ -104,4 +116,29 @@ onUnmounted(() => {
             </button>
         </div>
     </header>
+    
+    <!-- 全域小購物車側邊欄 -->
+    <MiniCart />
 </template>
+
+<style scoped>
+.btn_cart {
+    position: relative;
+}
+.cart_badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: #e74c3c;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    padding: 0 4px;
+}
+</style>

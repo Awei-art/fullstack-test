@@ -1,117 +1,222 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+// 1. 引入我們做好的 store
+import { useCartStore } from '@/stores/cart'
 
-// 假資料：模擬購物車內容
-const cartItems = ref([
-  {
-    id: 1,
-    title: '乾薑',
-    variant: '容量: 500g',
-    price: 18000,
-    quantity: 3,
-    image: '/images/dry-ginger-500.jpg' // 預設假圖路徑，前端需自行準備或用 placeholder
-  },
-  {
-    id: 2,
-    title: '乾薑',
-    variant: '容量: 120克',
-    price: 4200,
-    quantity: 3,
-    image: '/images/dry-ginger-120.jpg'
-  },
-  {
-    id: 3,
-    title: '乾薑',
-    variant: '容量: 2 袋套裝',
-    price: 1150,
-    quantity: 2,
-    image: '/images/dry-ginger-set.jpg'
+// 設定 API URL
+const config = useRuntimeConfig()
+const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient
+
+// 呼叫後端 API 取得最新商品與庫存資料
+const { data: products } = await useFetch('/products/', {
+  baseURL: baseURL
+})
+
+// 2. 初始化 store
+const cartStore = useCartStore()
+
+// 初始化 rawCartItems，對應原先的 store items
+const rawCartItems = computed(() => cartStore.items)
+
+// 結合即時的產品資料，確認購物車內商品使否有效（有庫存且品種未關閉）
+const cartItems = computed(() => {
+  if (!products.value) {
+    return rawCartItems.value.map(item => ({ ...item, isValid: true, statusText: '' }))
   }
-])
+
+  return rawCartItems.value.map(item => {
+    let isValid = true
+    let statusText = ''
+    let latestMaxStock = item.maxStock
+
+    const latestProduct = products.value.find(p => p.id === item.id)
+    if (!latestProduct) {
+      isValid = false
+      statusText = '已下架'
+    } else {
+      // 檢查等級庫存或總庫存
+      if (item.gradeId) {
+        const grade = latestProduct.grades?.find(g => g.id === item.gradeId)
+        if (grade) {
+          latestMaxStock = grade.stock
+          if (grade.stock <= 0) isValid = false
+        } else {
+          isValid = false
+          statusText = '等級已停售'
+        }
+      } else {
+        latestMaxStock = latestProduct.stock
+        if (latestProduct.stock <= 0) isValid = false
+      }
+
+      // 檢查品種是否全都有開放
+      if (isValid && item.varieties && item.varieties.length > 0) {
+        const activeVarietyIds = latestProduct.varieties ? latestProduct.varieties.map(v => v.id) : []
+        const hasClosedVariety = item.varieties.some(v => !activeVarietyIds.includes(v.id))
+        
+        if (hasClosedVariety) {
+          isValid = false
+        }
+      }
+      
+      // 如果上述檢查為不合法，設定為補貨中
+      if (!isValid && !statusText) {
+        statusText = '補貨中'
+      }
+    }
+
+    return {
+      ...item,
+      isValid,
+      statusText,
+      maxStock: latestMaxStock // 覆蓋成最新庫存
+    }
+  })
+})
+
+const validCartItems = computed(() => cartItems.value.filter(item => item.isValid))
+
+const subtotal = computed(() => {
+  return validCartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+})
+
+const totalQuantity = computed(() => {
+  return validCartItems.value.reduce((sum, item) => sum + item.quantity, 0)
+})
+
+// 系統自動計算的大購物車預設最終運費 (以 1 個地址作為結帳基準)
+const shippingFee = computed(() => {
+  const totalBoxes = totalQuantity.value
+  const tPrice = subtotal.value
+  if (totalBoxes === 0) return 0
+  
+  const avgPrice = tPrice / totalBoxes
+  let packages = []
+  let remainBoxes = totalBoxes
+  
+  // 1個地址的情況，每4盒拆一包
+  while (remainBoxes > 0) {
+    const pkgBoxes = Math.min(4, remainBoxes)
+    packages.push(pkgBoxes)
+    remainBoxes -= pkgBoxes
+  }
+
+  // 對每一包計算運費
+  let fees = packages.map(pkgBoxes => {
+    const pkgPrice = pkgBoxes * avgPrice
+    if (pkgBoxes >= 4 || pkgPrice >= 2500) return 0
+    if (pkgBoxes >= 2 || pkgPrice >= 1250) return 150
+    return 230
+  })
+
+  // 滿10盒免一件運費
+  if (totalBoxes >= 10) {
+    let nonZeroFees = fees.filter(fee => fee > 0)
+    if (nonZeroFees.length > 0) {
+      let maxFee = Math.max(...nonZeroFees)
+      let targetIndex = fees.indexOf(maxFee)
+      if (targetIndex !== -1) fees[targetIndex] = 0
+    }
+  }
+
+  return fees.reduce((sum, fee) => sum + fee, 0)
+})
+
+// 總金額 (小計 + 運費)
+const totalAmount = computed(() => {
+  return subtotal.value + shippingFee.value
+})
 
 // 格式化金額 (千分位)
 const formatPrice = (price) => {
   return 'NT$ ' + price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-const subtotal = computed(() => {
-  return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0)
-})
-
-const totalQuantity = computed(() => {
-  return cartItems.value.reduce((total, item) => total + item.quantity, 0)
-})
-
-const shippingFee = ref(0) // dynamic later? for now 0 as per image "¥0"
-
-const totalAmount = computed(() => {
-  return subtotal.value + shippingFee.value
-})
-
 // 增加數量
-const increaseQty = (item) => {
-  item.quantity++
+const increaseQty = (mappedItem) => {
+  const item = cartStore.items.find(i => i.key === mappedItem.key)
+  if (!item) return
+  // 檢查是否超過該商品的最高庫存
+  if (item.quantity < mappedItem.maxStock) {
+    item.quantity++
+    cartStore.saveToLocalStorage() // 數字改變，記得存檔
+  } else {
+    alert(`此商品目前庫存只剩 ${mappedItem.maxStock} 件`)
+  }
 }
 
 // 減少數量
-const decreaseQty = (item) => {
+const decreaseQty = (mappedItem) => {
+  const item = cartStore.items.find(i => i.key === mappedItem.key)
+  if (!item) return
   if (item.quantity > 1) {
     item.quantity--
+    cartStore.saveToLocalStorage() // 數字改變，記得存檔
   }
 }
 
 // 移除商品
-const removeItem = (id) => {
-  cartItems.value = cartItems.value.filter(item => item.id !== id)
+const removeItem = (key) => {
+  if (confirm('確定要移除這個商品嗎？')) {
+    cartStore.removeFromCart(key)
+  }
 }
 
-// 繼續購物 (範例功能)
+// 繼續購物
 const continueShopping = () => {
-  // 可導向首頁或商品頁
   navigateTo('/products')
 }
 
-// 結帳 (範例功能)
+// 結帳
 const checkout = () => {
-  alert(`準備結帳：${formatPrice(subtotal.value)}`)
+  if (validCartItems.value.length === 0) {
+    alert('購物車內目前沒有可結帳的商品')
+    return
+  }
+  alert(`準備結帳：${formatPrice(totalAmount.value)}`)
 }
 </script>
 
 <template>
   <div class="cart_page">
-    <h1 class="page_title">購物車</h1> <!-- 直譯 Cart 為 "大車" (亦可改為 購物車) -->
+    <h1 class="page_title">購物車</h1>
 
+    <ClientOnly>
     <div class="cart_container" v-if="cartItems.length > 0">
       
-      <!-- Left Column: Product List -->
       <div class="cart_items_area">
         <div 
           v-for="item in cartItems" 
-          :key="item.id" 
+          :key="item.key" 
           class="cart_item"
+          :class="{ 'out_of_stock_item': !item.isValid }"
         >
-          <!-- 商品圖片 -->
           <div class="item_image_col">
             <div class="img_placeholder">
-               <!-- 這裡使用背景色模擬圖片，若有真實圖片可換 <img :src="item.image"> -->
-               <img v-if="item.image" :src="item.image" :alt="item.title" @error="e => e.target.style.display='none'" />
+               <img v-if="item.image" :src="item.image" :alt="item.name" @error="e => e.target.style.display='none'" />
             </div>
           </div>
 
-          <!-- 商品資訊 -->
           <div class="item_info_col">
-            <h2 class="item_title">{{ item.title }}</h2>
-            <p class="item_variant">{{ item.variant }}</p>
+            <h2 class="item_title">
+              {{ item.name }}
+              <span v-if="!item.isValid" class="status_badge">{{ item.statusText }}</span>
+            </h2>
+            
+            <p class="item_variant">
+              <span v-if="item.gradeName">【{{ item.gradeName }}】</span>
+              <span v-if="item.varieties && item.varieties.length > 0">
+                內容物：{{ item.varieties.map(v => v.name).join(' + ') }}
+              </span>
+            </p>
 
-            <!-- 數量選擇器 -->
-            <div class="qty_control">
-              <button class="qty_btn" @click="decreaseQty(item)" :disabled="item.quantity <= 1">-</button>
+            <div class="qty_control" :class="{ 'disabled_area': !item.isValid }">
+              <button class="qty_btn" @click="decreaseQty(item)" :disabled="item.quantity <= 1 || !item.isValid">-</button>
               <span class="qty_text">{{ item.quantity }}</span>
-              <button class="qty_btn" @click="increaseQty(item)">+</button>
+              <button class="qty_btn" @click="increaseQty(item)" :disabled="item.quantity >= item.maxStock || !item.isValid">+</button>
             </div>
 
-            <!-- 移除按鈕 -->
-            <button class="remove_btn" @click="removeItem(item.id)">
+            <button class="remove_btn" @click="removeItem(item.key)">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -121,14 +226,12 @@ const checkout = () => {
             </button>
           </div>
 
-          <!-- 單項總價 -->
           <div class="item_price_col">
             <span class="price_text">{{ formatPrice(item.price * item.quantity) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Order Summary (Sticky) -->
       <div class="cart_summary_area">
         <div class="summary_card">
           <NuxtLink to="/products" class="summary_header">
@@ -153,8 +256,6 @@ const checkout = () => {
              </div>
           </div>
           
-
-
           <hr class="summary_divider">
 
           <div class="summary_total">
@@ -162,44 +263,40 @@ const checkout = () => {
             <span class="total_price">{{ formatPrice(totalAmount) }}</span>
           </div>
 
-          <!-- Checkout Button -->
-          <button class="checkout_btn" @click="checkout">
+          <button class="checkout_btn" @click="checkout" :disabled="validCartItems.length === 0" :class="{ 'btn-disabled': validCartItems.length === 0 }">
             結帳
           </button>
 
-          <!-- Payment Icons -->
-          <div class="payment_icons">
-            <div class="pay_icon shop_pay">shop</div>
-            <div class="pay_icon paypal">PayPal</div>
-            <div class="pay_icon gpay"><span class="g">G</span> Pay</div>
-          </div>
 
-          <!-- Shipping Notice -->
+
           <div class="shipping_notice">
             <p>全台皆可運送</p>
             <p>皆採宅配 (出貨後隔天到達，週日貨運無營業順延周一)</p>
             <p class="highlight">※ 東部區域可能會晚 1-2 天到達</p>
           </div>
 
-          <!-- Continue Shopping -->
+          <!-- 加入智能多地址運費計算機元件 (僅供試算，不連動最終結帳金額) -->
+          <ShippingCalculator 
+            :totalBoxes="totalQuantity" 
+            :totalPrice="subtotal" 
+          />
+
           <button class="continue_btn" @click="continueShopping">
             繼續購物
           </button>
 
         </div>
       </div>
-
     </div>
 
-    <!-- Empty State -->
     <div v-else class="empty_cart">
       <p>購物車目前是空的</p>
       <button class="continue_btn" @click="continueShopping" style="max-width: 200px;">去逛逛</button>
     </div>
+</ClientOnly>
 
   </div>
 </template>
-
 <style scoped>
 /* 全局設定 */
 .cart_page {
@@ -270,6 +367,38 @@ const checkout = () => {
   margin-bottom: 8px;
   font-weight: 500;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status_badge {
+  font-size: 0.8rem;
+  color: #e74c3c;
+  background: #fdf0ed;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.out_of_stock_item {
+  color: #999;
+}
+
+.out_of_stock_item .img_placeholder img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.out_of_stock_item .item_title, 
+.out_of_stock_item .item_variant,
+.out_of_stock_item .price_text {
+  color: #aaa;
+}
+
+.disabled_area {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .item_variant {
@@ -457,8 +586,14 @@ const checkout = () => {
   transition: opacity 0.2s;
 }
 
-.checkout_btn:hover {
+.checkout_btn:hover:not(:disabled) {
   opacity: 0.8;
+}
+
+.checkout_btn:disabled {
+  background-color: #eee;
+  color: #999;
+  cursor: not-allowed;
 }
 
 /* 付款圖示區 */
