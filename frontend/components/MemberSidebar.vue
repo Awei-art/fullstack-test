@@ -12,12 +12,6 @@ const menuItems = ref([
 
 <template>
   <div class="sidebar-container">
-    <div class="profile-section">
-      <!-- Placeholder image if no user avatar provided -->
-      <img src="https://ui-avatars.com/api/?name=Tian+Yuan&background=C1A96C&color=fff" alt="User Avatar" class="avatar" />
-      <div class="user-name">王小明</div>
-    </div>
-
     <ul class="menu-list">
       <li class="menu-item" v-for="item in menuItems" :key="item.name">
         <!-- Using a hash or placeholder link for now as sub-pages might not exist -->
@@ -26,10 +20,6 @@ const menuItems = ref([
         </NuxtLink>
       </li>
     </ul>
-
-    <button class="logout-btn">
-      登出
-    </button>
   </div>
 </template>
 

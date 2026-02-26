@@ -161,3 +161,30 @@ SIMPLE_JWT = {
 
 # 告訴 Django 使用我們自訂的使用者模型
 AUTH_USER_MODEL = 'accounts.User'
+
+# 認證後端 (允許信箱與帳號雙通道登入)
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# LINE Login 設定
+LINE_CHANNEL_ID = os.environ.get('LINE_CHANNEL_ID', '2009217904')
+LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '***REMOVED_LINE_SECRET***')
+LINE_CALLBACK_URL = os.environ.get('LINE_CALLBACK_URL', 'http://localhost:3000/login/callback')
+
+# Google Login 設定
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '***REMOVED_GOOGLE_CLIENT_ID***')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '***REMOVED_GOOGLE_SECRET***')
+GOOGLE_CALLBACK_URL = os.environ.get('GOOGLE_CALLBACK_URL', 'http://localhost:3000/login/google-callback')
+
+# Email (Gmail) 發信引擎設定
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# 您的電商信箱
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '***REMOVED_EMAIL***') 
+# 這是您剛剛產生的 16 碼 App Password (中間的空格拿掉)
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '***REMOVED_EMAIL_PASSWORD***')
+DEFAULT_FROM_EMAIL = '田原葡萄 <' + EMAIL_HOST_USER + '>'

@@ -3,8 +3,19 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import MiniCart from '@/components/MiniCart.vue'
 
+// 取得使用者 Cookie
+const userCookie = useCookie('user_info')
+
 const cartStore = useCartStore()
 const cartTotalQty = computed(() => cartStore.totalQty)
+
+// 🔥 登出功能
+const handleLogout = () => {
+    if (confirm('確定要登出嗎？')) {
+        userCookie.value = null
+        navigateTo('/login') // 回到登入頁
+    }
+}
 
 const openMiniCart = (e) => {
     e.preventDefault()
@@ -92,7 +103,7 @@ onUnmounted(() => {
                     <!-- 數量標籤 -->
                     <span v-if="cartTotalQty > 0" class="cart_badge">{{ cartTotalQty }}</span>
                 </a>
-                <NuxtLink to="/login" class="btn_login">
+                <NuxtLink v-if="!userCookie" to="/login" class="btn_login">
                     <span class="btn_text">登入</span>
                     <svg class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
                         stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -100,6 +111,25 @@ onUnmounted(() => {
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </NuxtLink>
+                <!-- 登入後顯示會員頭貼 -->
+                <NuxtLink v-else to="/member" class="btn_login logged-in">
+                    <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="header-avatar">
+                    <svg v-else class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                        stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="btn_text user-name">{{ userCookie.username || '會員中心' }}</span>
+                </NuxtLink>
+                <!-- 登出按鈕 (登入後才有) -->
+                <button v-if="userCookie" @click="handleLogout" class="header-logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    登出
+                </button>
             </div>
 
             <button type="button" class="btn_all_menu" :class="{ active: isMenuOpen }" @click.stop="toggleMenu">
@@ -140,5 +170,85 @@ onUnmounted(() => {
     border-radius: 50%;
     border: 1px solid #fff;
     padding: 0 4px;
+}
+
+/* 登入後的按鈕樣式 */
+.btn_login.logged-in {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: none; /* 移除紫色內縮外框 */
+    padding: 5px 10px;
+}
+
+/* 移除登入後按鈕 Hover 時原本的背景填補動畫 */
+.btn_login.logged-in::before {
+    display: none;
+}
+
+/* 改為單純的透明度 Hover 效果 */
+.btn_login.logged-in:hover {
+    box-shadow: none;
+    background: transparent;
+    opacity: 0.8;
+    color: var(--grape-primary); /* 防止原本 hover 的文字變白設定生效 */
+}
+
+.header-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.user-name {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 頂端登出按鈕 */
+.header-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--grape-primary); /* 邊框與文字同色 */
+    color: var(--grape-primary);
+    padding: 6px 12px;
+    border-radius: 6px; /* 這裡改為較方的圓角 6px */
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* 取消預設 button 樣式 */
+    outline: none;
+}
+.header-logout-btn:hover {
+    background: var(--grape-primary); /* Hover 填滿原本文字顏色的底色 */
+    color: #fff; /* 文字變白色 */
+    border-color: var(--grape-primary);
+}
+
+@media (max-width: 900px) {
+    /* 在手機版隱藏文字只顯示圖示 */
+    .header-logout-btn {
+        width: 36px;
+        height: 36px;
+        padding: 5px;
+        border: none;
+        border-radius: 8px; /* 手機版也從圓圈改為微圓角的方型 */
+        color: var(--grape-primary);
+        justify-content: center;
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .header-logout-btn svg {
+        text-indent: 0;
+        position: absolute;
+    }
 }
 </style>

@@ -16,6 +16,34 @@
     max-width: 400px;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #333;
+    position: relative;
+}
+
+/* 返回按鈕樣式 */
+.back-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.back-btn:hover {
+    color: #C1A96C;
+}
+
+.back-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
 }
 
 .login_header {
@@ -100,6 +128,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

@@ -17,7 +17,8 @@ const isLoading = ref(true);
 const memberInfo = ref({
   name: '',
   level: '',
-  joinDate: ''
+  joinDate: '',
+  avatar: ''
 });
 
 // 帳號資料
@@ -26,11 +27,8 @@ const accountData = ref({
   phone: ''
 });
 
-// 最後登入
-const lastLogin = ref({
-  time: '',
-  location: ''
-});
+// 最近登入紀錄
+const recentLogins = ref([]);
 
 // 訂單資料（假資料）
 const recentOrder = ref({
@@ -54,25 +52,18 @@ const fetchMemberData = async () => {
   try {
     isLoading.value = true; // 🔥 開始載入
     
-    const { data, error } = await useFetch(`${config.public.apiBase}/profile/`, {
+    const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase;
+    
+    // 將 useFetch 改為 $fetch，避免 Nuxt 狀態快取阻擋新資料
+    const realData = await $fetch('/profile/', {
+      baseURL: baseURL,
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
-    if (error.value) {
-      console.error('抓取資料失敗:', error.value);
-      
-      if (error.value.statusCode === 401) {
-        userCookie.value = null;
-        return navigateTo('/login');
-      }
-      
-      throw new Error('載入失敗');
-    }
-
-    if (data.value) {
-      const realData = data.value;
+    if (realData) {
       console.log('拿到真實資料:', realData);
 
       // 🔥 格式化日期
@@ -90,9 +81,10 @@ const fetchMemberData = async () => {
 
       // 更新資料
       memberInfo.value = {
-        name: realData.username,
+        name: realData.first_name || realData.username, // 優先使用顯示名稱
         level: realData.level || '一般會員',
-        joinDate: formatDate(realData.date_joined)
+        joinDate: formatDate(realData.date_joined),
+        avatar: realData.avatar || '/images/default_avatar.png' // 設定預設頭貼
       };
 
       accountData.value = {
@@ -100,14 +92,30 @@ const fetchMemberData = async () => {
         phone: realData.phone || '未設定'
       };
 
-      lastLogin.value = {
-        time: formatDateTime(realData.last_login),
-        location: '台灣 (Chrome Windows)'
-      };
+      recentLogins.value = (realData.recent_logins || []).map((record, index) => {
+        // 第一筆當作「目前登入中」
+        const isCurrent = index === 0;
+        // 使用後端提供的所在地理位置
+        const locationStr = record.location || '未知確切地點';
+        return {
+          time: formatDateTime(record.login_time),
+          location: locationStr, 
+          device: record.device_info || '未知裝置',
+          isCurrent: isCurrent
+        };
+      });
+      // 確保至少有一筆
+      if (recentLogins.value.length === 0) {
+        recentLogins.value.push({ time: formatDateTime(realData.last_login), location: '台灣 (預設)', device: '預設裝置' });
+      }
     }
 
   } catch (err) {
     console.error('系統錯誤:', err);
+    if (err.response?.status === 401 || err.data?.statusCode === 401) {
+      userCookie.value = null;
+      window.location.href = '/login';
+    }
   } finally {
     isLoading.value = false; // 🔥 載入完成
   }
@@ -146,20 +154,15 @@ onMounted(() => {
         <template v-else>
           <!-- Top Banner -->
           <div class="member-banner">
-            <div class="banner-info">
-              <div class="level-badge">{{ memberInfo.level }}</div>
-              <h1 class="welcome-text">早安，{{ memberInfo.name }}</h1>
-              <p class="join-date">加入日期：{{ memberInfo.joinDate }}</p>
+            <div class="banner-info" style="display: flex; align-items: center; gap: 20px;">
+              <!-- 顯示大頭貼 -->
+              <img :src="memberInfo.avatar" alt="Avatar" class="member-avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+              <div>
+                <div class="level-badge">{{ memberInfo.level }}</div>
+                <h1 class="welcome-text">早安，{{ memberInfo.name }}</h1>
+                <p class="join-date">加入日期：{{ memberInfo.joinDate }}</p>
+              </div>
             </div>
-            <!-- 🔥 登出按鈕 -->
-            <button @click="handleLogout" class="logout-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              登出
-            </button>
           </div>
 
           <!-- Info Grid -->
@@ -201,15 +204,25 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Card C: Last Login -->
+            <!-- Card C: Last Logins -->
             <div class="info-card">
               <div class="card-header">
-                <h3>最近登入</h3>
+                <h3>最近登入紀錄</h3>
               </div>
               <div class="card-body">
-                <div class="login-time">{{ lastLogin.time }}</div>
-                <div class="login-location">{{ lastLogin.location }}</div>
-                <p class="security-tip">若非本人登入，請立即修改密碼</p>
+                <div v-for="(login, index) in recentLogins" :key="index" style="margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px;">
+                  <!-- 第一筆紀錄才會增加顯示綠燈狀態 -->
+                  <div v-if="login.isCurrent" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <div style="width: 8px; height: 8px; background-color: #4CAF50; border-radius: 50%; box-shadow: 0 0 4px #4CAF50;"></div>
+                    <div style="font-size: 13px; color: #4CAF50; font-weight: bold;">目前登入中</div>
+                  </div>
+                  <!-- 無論哪一筆都統一顯示相同的紀錄格式 -->
+                  <div style="display: flex; flex-direction: column;">
+                    <div style="font-size: 13px; color: #555; font-weight: bold;">{{ login.location }}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 2px;">{{ login.time }}</div>
+                  </div>
+                </div>
+                <p class="security-tip" style="margin-top: 15px; font-size: 12px; color: #8bc34a;">若有未知的登入活動，請立即修改密碼。保護您的帳號安全。</p>
               </div>
             </div>
 
