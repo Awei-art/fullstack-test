@@ -68,15 +68,47 @@
     color: #C1A96C;
 }
 
-.menu-link.active,
-/* Manual active class */
-.router-link-active {
-    /* Nuxt/Vue Router active class */
+.menu-link.active {
+    /* Nuxt/Vue Router active class handled by custom logic */
     background-color: #FAF8F2;
     /* Very light gold/beige */
     color: #C1A96C;
     font-weight: 500;
     border-left: 3px solid #C1A96C;
+}
+
+/* Sub Menu List */
+.sub-menu-list {
+    list-style: none;
+    padding-left: 24px;
+    margin: 4px 0 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sub-menu-link {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #888;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.sub-menu-link:hover {
+    color: #C1A96C;
+    background-color: transparent;
+}
+
+.sub-menu-link.active,
+.sub-menu-link.router-link-active {
+    color: #C1A96C;
+    font-weight: 500;
+    border-left: none;
+    background-color: transparent;
 }
 
 .logout-btn {
@@ -150,8 +182,7 @@
         /* Remove side border for tabs */
     }
 
-    .menu-link.active,
-    .router-link-active {
+    .menu-link.active {
         background-color: #C1A96C;
         color: white;
     }
@@ -159,5 +190,27 @@
     .logout-btn {
         display: none;
         /* Often hide logout in tabs, or move to a separate settings area */
+    }
+
+    /* Sub Menu Adjustments */
+    .sub-menu-list {
+        display: flex;
+        flex-direction: row;
+        padding-left: 0;
+        margin: 0;
+        gap: 12px;
+    }
+
+    .sub-menu-link {
+        padding: 8px 16px;
+        background-color: #f5f5f5;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .sub-menu-link.active,
+    .sub-menu-link.router-link-active {
+        background-color: #C1A96C;
+        color: white;
     }
 }

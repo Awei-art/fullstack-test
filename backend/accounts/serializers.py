@@ -1,6 +1,6 @@
 from rest_framework import serializers
 import re
-from .models import User, UserLoginRecord
+from .models import User, UserLoginRecord, UserAddress, UserAddress
 
 class UserLoginRecordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'avatar', 'level', 'phone', 'date_joined', 'last_login', 'recent_logins']
+        fields = ['id', 'username', 'email', 'first_name', 'avatar', 'level', 'phone', 'date_joined', 'last_login', 'recent_logins', 'nickname', 'gender', 'birth_month_day', 'accept_promotions']
         # 不要回傳 password！
     
     def get_recent_logins(self, obj):
@@ -25,6 +25,15 @@ class UserSerializer(serializers.ModelSerializer):
         return UserLoginRecordSerializer(records, many=True).data
 
 
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    """
+    更新個人資料專用序列化器
+    確保只能修改低風險欄位
+    """
+    class Meta:
+        model = User
+        fields = ['nickname', 'gender', 'birth_month_day', 'accept_promotions']
 
 #建立註冊序列化器
 class RegisterSerializer(serializers.ModelSerializer):
@@ -84,3 +93,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    """
+    會員地址簿序列化器
+    """
+    class Meta:
+        model = UserAddress
+        fields = ['id', 'title', 'receiver_name', 'receiver_phone', 'city', 'district', 'detail_address', 'is_default']
+        read_only_fields = ['id']

@@ -8,9 +8,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
-from .serializers import UserSerializer, RegisterSerializer
-from .models import User, UserLoginRecord
+from .serializers import UserSerializer, RegisterSerializer, UserProfileUpdateSerializer, UserAddressSerializer
+from .models import User, UserLoginRecord, UserAddress
 from django.db import models
+from django.contrib.auth.models import update_last_login
+from rest_framework import generics
 
 #建立個人資料視圖
 class UserProfileView(APIView):#建立一個 API 視圖類別
@@ -25,6 +27,17 @@ class UserProfileView(APIView):#建立一個 API 視圖類別
         # request.user 是登入的使用者（由 JWT 自動解析）
         serializer = UserSerializer(request.user)#把 User 物件轉成 JSON
         return Response(serializer.data)#回傳 JSON 給前端
+
+    def put(self, request):
+        """
+        更新個人資料（只允許安全欄位這部分由 serializer 控制）
+        """
+        serializer = UserProfileUpdateSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            # 儲存後回傳最新的完整資料
+            return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 import requests
 
@@ -70,6 +83,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                         location=location,
                         device_info=request.META.get('HTTP_USER_AGENT')
                     )
+                    # 更新最後登入時間
+                    update_last_login(None, user)
                 except User.DoesNotExist:
                     pass
         return response
@@ -180,6 +195,9 @@ class LineLoginView(APIView):
         # 4. 手動幫這名使用者產生 JWT Token
         refresh = RefreshToken.for_user(user)
 
+        # 更新最後登入時間
+        update_last_login(None, user)
+
         # 寫入登入紀錄
         ip = get_client_ip(request)
         location = get_location_from_ip(ip)
@@ -270,6 +288,9 @@ class GoogleLoginView(APIView):
 
         # 4. 手動幫這名使用者產生 JWT Token
         refresh = RefreshToken.for_user(user)
+
+        # 更新最後登入時間
+        update_last_login(None, user)
 
         # 寫入登入紀錄
         ip = get_client_ip(request)
@@ -371,3 +392,82 @@ class ResetPasswordView(APIView):
             return Response({'message': '密碼已成功重設！馬上就可以用新密碼登入了。'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': '這組重設連結已經過期，或者您已經使用它重設過密碼了。請重新發送忘記密碼。'}, status=status.HTTP_400_BAD_REQUEST)
+
+class UserAddressListView(generics.ListCreateAPIView):
+    """
+    獲取使用者的所有地址 (GET) 或是 新增一筆地址 (POST)
+    """
+    serializer_class = UserAddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # 只能拿到「自己的」地址
+        return UserAddress.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # 建立地址時，強制綁定目前登入的 user
+        # 並檢查如果他是第一筆地址，自動設為預設
+        is_first = UserAddress.objects.filter(user=self.request.user).count() == 0
+        is_default = self.request.data.get('is_default', False)
+        serializer.save(user=self.request.user, is_default=is_default or is_first)
+
+class UserAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    獲取 (GET)、更新 (PUT)、或刪除 (DELETE) 某一筆特定地址
+    """
+    serializer_class = UserAddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return UserAddress.objects.filter(user=self.request.user)
+        
+    def perform_update(self, serializer):
+        # 修改地址的處理
+        serializer.save()
+
+class ChangePasswordView(APIView):
+    """
+    登入會員獨立的修改密碼頁面專用 API
+    POST /api/auth/password/change/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        
+        # 1. 如果這位客人是 LINE / Google 登入且從來沒有設過密碼
+        if not user.has_usable_password():
+            return Response({'error': '您目前是使用社群帳號登入，無需修改密碼。'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        
+        if not old_password or not new_password:
+            return Response({'error': '舊密碼與新密碼皆為必填。'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 2. 驗證舊密碼是否正確
+        if not user.check_password(old_password):
+            return Response({'error': '您輸入的舊密碼不正確，請重新確認。'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 3. 驗證新密碼強度
+        if len(new_password) < 8:
+            return Response({'error': '新密碼必須至少 8 碼'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        import re
+        if not re.search(r'[A-Z]', new_password):
+            return Response({'error': '新密碼必須包含至少 1 個大寫英文字母'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'[a-z]', new_password):
+            return Response({'error': '新密碼必須包含至少 1 個小寫英文字母'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'\d', new_password):
+            return Response({'error': '新密碼必須包含至少 1 個數字'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if old_password == new_password:
+            return Response({'error': '新密碼不能與原密碼相同。'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 4. 一切安全，更換密碼
+        user.set_password(new_password)
+        user.save()
+        
+        # 注意：雖然更換密碼可能會造成舊的 token 失效（視 JWT 設定而定），
+        # 但有些設定中 access token 還會有效直到過期，這裡我們先不強制剔除。
+        return Response({'message': '密碼更新成功！'}, status=status.HTTP_200_OK)
