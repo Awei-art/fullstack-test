@@ -13,7 +13,10 @@ const menuItems = ref([
       { name: '修改登入密碼', link: '/member/password' }
     ]
   },
-  { name: '歷史訂單', link: '/member/orders' },
+  { 
+    name: '訂單狀態', 
+    link: '/member/orders',
+  },
   { name: '我的優惠券', link: '/member/coupons' },
   { name: '收件地址管理', link: '/member/address' },
 ])

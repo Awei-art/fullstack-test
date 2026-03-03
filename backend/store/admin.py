@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin
 # Register your models here.
 
 #定義品種頁 顯示有貨
@@ -37,5 +37,56 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'stock', 'is_mixed', 'get_spec_display', 'mix_limit') # 列表頁顯示這幾欄
     list_editable = ('mix_limit',) # 👈 讓您可以直接在列表改數字，不用點進去
     filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
+    filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
     #放在同一個頁面最下方
     inlines = [ProductImageInline, ProductGradeInline] # 讓詳細圖出現在同一個頁面
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('code', 'title', 'discount_type', 'discount_value', 'is_active', 'valid_to')
+    list_filter = ('is_active', 'discount_type')
+    search_fields = ('code', 'title')
+
+@admin.register(UserCoupon)
+class UserCouponAdmin(admin.ModelAdmin):
+    list_display = ('user', 'coupon', 'is_used', 'used_at', 'order')
+    list_filter = ('is_used', 'coupon')
+    search_fields = ('user__username', 'coupon__code', 'coupon__title')
+    readonly_fields = ('used_at', 'order')
+
+# ========================================
+# 訂單管理 Admin
+# ========================================
+
+class OrderItemInline(admin.TabularInline):
+    """訂單品項內嵌在訂單頁面"""
+    model = OrderItem
+    extra = 0  # 不顯示空白列
+    readonly_fields = ['product_name', 'grade_name', 'variety_names', 'unit_price', 'quantity', 'item_total']
+    fields = ['product_name', 'grade_name', 'variety_names', 'unit_price', 'quantity', 'item_total']
+    can_delete = False
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = [
+        'order_number', 'receiver_name', 'total_amount',
+        'status', 'payment_method', 'payment_status', 'created_at', 'coupon_code'
+    ]
+    list_filter = ['status', 'payment_method', 'payment_status', 'created_at']
+    search_fields = ['order_number', 'receiver_name', 'receiver_phone', 'coupon_code']
+    list_editable = ['status', 'payment_status']
+    readonly_fields = ['order_number', 'user', 'subtotal', 'shipping_fee', 'coupon_code', 'discount_amount', 'total_amount', 'created_at', 'updated_at']
+    inlines = [OrderItemInline]
+
+    # 按下單時間排序
+    ordering = ['-created_at']
+
+@admin.register(Bulletin)
+class BulletinAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'sort_order', 'start_date', 'end_date', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'content')
+    list_editable = ('is_active', 'sort_order')
+    ordering = ('-sort_order', '-created_at')

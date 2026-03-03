@@ -102,3 +102,11 @@ class UserAddressSerializer(serializers.ModelSerializer):
         model = UserAddress
         fields = ['id', 'title', 'receiver_name', 'receiver_phone', 'city', 'district', 'detail_address', 'is_default']
         read_only_fields = ['id']
+
+    def validate_receiver_phone(self, value):
+        """驗證台灣手機號碼格式：09 開頭，共 10 碼純數字"""
+        # 去除空白與連字號
+        cleaned = value.replace(' ', '').replace('-', '')
+        if not re.match(r'^09\d{8}$', cleaned):
+            raise serializers.ValidationError('請輸入正確的手機號碼（09 開頭，共 10 碼數字）')
+        return cleaned

@@ -30,13 +30,8 @@ const accountData = ref({
 // 最近登入紀錄
 const recentLogins = ref([]);
 
-// 訂單資料（假資料）
-const recentOrder = ref({
-  id: '#ABCD-123456',
-  date: '2025-01-20',
-  total: 'NT$ 1,280',
-  status: '配送中'
-});
+// 最近的訂單資料
+const recentOrder = ref(null);
 
 // 🔥 Cookie
 const userCookie = useCookie('user_info');
@@ -54,14 +49,22 @@ const fetchMemberData = async () => {
     
     const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase;
     
-    // 將 useFetch 改為 $fetch，避免 Nuxt 狀態快取阻擋新資料
-    const realData = await $fetch('/profile/', {
-      baseURL: baseURL,
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
+    // 同時抓取會員資料與訂單列表
+    const [realData, ordersData] = await Promise.all([
+      $fetch('/profile/', {
+        baseURL: baseURL,
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }),
+      $fetch('/orders/', {
+        baseURL: baseURL,
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(err => {
+        console.error('抓取訂單失敗', err);
+        return [];
+      })
+    ]);
 
     if (realData) {
       console.log('拿到真實資料:', realData);
@@ -107,6 +110,21 @@ const fetchMemberData = async () => {
       // 確保至少有一筆
       if (recentLogins.value.length === 0) {
         recentLogins.value.push({ time: formatDateTime(realData.last_login), location: '台灣 (預設)', device: '預設裝置' });
+      }
+      
+      // 處理最新的訂單資料
+      if (ordersData && ordersData.length > 0) {
+        // 依據建立時間降冪排序 (最新的在前面)
+        const sortedOrders = ordersData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const latest = sortedOrders[0];
+        recentOrder.value = {
+          order_number: latest.order_number,
+          date: formatDate(latest.created_at),
+          total: Number(latest.total_amount).toLocaleString(),
+          status_display: latest.status_display
+        };
+      } else {
+        recentOrder.value = null; // 尚無訂單
       }
     }
 
@@ -174,15 +192,20 @@ onMounted(() => {
                 <h3>最近訂單</h3>
                 <NuxtLink to="/member/orders" class="more-link">查看全部 ›</NuxtLink>
               </div>
-              <div class="card-body">
+              <div class="card-body" v-if="recentOrder">
                 <div class="order-status-highlight">
-                  {{ recentOrder.status }}
+                  {{ recentOrder.status_display }}
                 </div>
                 <div class="order-details">
-                  <p>訂單編號：{{ recentOrder.id }}</p>
+                  <p>訂單編號：#{{ recentOrder.order_number }}</p>
                   <p>訂單日期：{{ recentOrder.date }}</p>
-                  <p class="order-total">總金額：{{ recentOrder.total }}</p>
+                  <p class="order-total">總金額：NT$ {{ recentOrder.total }}</p>
                 </div>
+              </div>
+              <!-- 尚無訂單時的畫面 -->
+              <div class="card-body" v-else style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0;">
+                <p style="color: #999; margin-bottom: 15px;">目前還沒有訂單紀錄</p>
+                <NuxtLink to="/products" class="action-btn" style="text-decoration: none; text-align: center; display: inline-block;">去逛逛商品</NuxtLink>
               </div>
             </div>
 

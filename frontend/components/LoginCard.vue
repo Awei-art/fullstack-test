@@ -190,7 +190,7 @@ const handleLogin = async () => {
       </div>
 
       <!-- 🔥 新增：LINE 登入按鈕 -->
-      <a :href="`https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=http://localhost:3000/login/callback&state=login_state_123&scope=profile%20openid`" class="line-login-btn">
+      <a :href="`https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=http://localhost:3000/login/line-callback&state=login_state_123&scope=profile%20openid`" class="line-login-btn">
         <i class="fab fa-line line-icon"></i>
         <span>使用 LINE 快速登入</span>
       </a>

@@ -172,7 +172,7 @@ AUTHENTICATION_BACKENDS = [
 # LINE Login 設定
 LINE_CHANNEL_ID = os.environ.get('LINE_CHANNEL_ID', '2009217904')
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '***REMOVED_LINE_SECRET***')
-LINE_CALLBACK_URL = os.environ.get('LINE_CALLBACK_URL', 'http://localhost:3000/login/callback')
+LINE_CALLBACK_URL = os.environ.get('LINE_CALLBACK_URL', 'http://localhost:3000/login/line-callback')
 
 # Google Login 設定
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '***REMOVED_GOOGLE_CLIENT_ID***')
@@ -189,3 +189,15 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '***REMOVED_EMAIL***')
 # 這是您剛剛產生的 16 碼 App Password (中間的空格拿掉)
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '***REMOVED_EMAIL_PASSWORD***')
 DEFAULT_FROM_EMAIL = '田原葡萄 <' + EMAIL_HOST_USER + '>'
+
+# ========================================
+# ECPay 綠界金流設定 (測試環境)
+# ========================================
+ECPAY_MERCHANT_ID = os.environ.get('ECPAY_MERCHANT_ID', '3002607')
+ECPAY_HASH_KEY = os.environ.get('ECPAY_HASH_KEY', '***REMOVED_ECPAY_KEY***')
+ECPAY_HASH_IV = os.environ.get('ECPAY_HASH_IV', '***REMOVED_ECPAY_IV***')
+ECPAY_PAYMENT_URL = os.environ.get('ECPAY_PAYMENT_URL', 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5')
+# 前端網址 (付款完成後跳回)
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+# 後端網址 (ECPay Webhook 回傳用，正式上線時需改為公開網址)
+BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8000')

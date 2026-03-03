@@ -14,6 +14,7 @@ const saveMessage = ref('');
 const errorMessage = ref('');
 const showFormSuccessMask = ref(false);
 const settingDefaultId = ref(null);
+const phoneError = ref('');
 
 // 台灣縣市與鄉鎮資料
 const taiwanCities = {
@@ -127,12 +128,35 @@ const openEditForm = (address) => {
 };
 
 // 2. 儲存 (新增/修改) 地址
+// 電話號碼即時驗證
+const validatePhone = () => {
+  const phone = form.value.receiver_phone.replace(/[\s-]/g, '');
+  if (!phone) {
+    phoneError.value = '';
+    return;
+  }
+  if (!/^09\d{0,8}$/.test(phone)) {
+    phoneError.value = '手機號碼須為 09 開頭的數字';
+  } else if (phone.length < 10) {
+    phoneError.value = `還需要輸入 ${10 - phone.length} 碼`;
+  } else {
+    phoneError.value = '';
+  }
+};
+
 const handleSave = async () => {
   if (isSaving.value) return;
   
   if (!form.value.receiver_name || !form.value.receiver_phone || !form.value.city || !form.value.district || !form.value.detail_address) {
       errorMessage.value = '除了標籤外，其他欄位皆為必填。';
       return;
+  }
+
+  // 電話格式驗證
+  const cleanedPhone = form.value.receiver_phone.replace(/[\s-]/g, '');
+  if (!/^09\d{8}$/.test(cleanedPhone)) {
+    errorMessage.value = '請輸入正確的手機號碼（09 開頭，共 10 碼數字）';
+    return;
   }
 
   isSaving.value = true;
@@ -365,10 +389,14 @@ onMounted(() => {
                             v-model="form.receiver_phone" 
                             type="tel" 
                             class="form-input" 
+                            :class="{ 'input-error': phoneError }"
                             placeholder="例如：0912345678" 
                             :disabled="isSaving"
                             required
+                            maxlength="10"
+                            @input="validatePhone"
                           />
+                          <span v-if="phoneError" class="field-error">{{ phoneError }}</span>
                         </div>
                     </div>
                     
@@ -551,6 +579,9 @@ onMounted(() => {
 /* 全局訊息區 */
 .global-success-msg { background-color: #E8F5E9; color: #2F8A3B; padding: 12px 20px; border-radius: 8px; font-weight: 500; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; border: 1px solid #c8e6c9; }
 .error-msg { color: #E25E5E; font-size: 14px; background-color: #FEE2E2; padding: 12px 16px; border-radius: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #fecaca; }
+.field-error { font-size: 12px; color: #E25E5E; margin-top: 2px; }
+.input-error { border-color: #E25E5E !important; }
+.input-error:focus { box-shadow: 0 0 0 3px rgba(226, 94, 94, 0.15) !important; }
 .spinner-small { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 

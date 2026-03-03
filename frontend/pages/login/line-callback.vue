@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -47,8 +47,10 @@ onMounted(async () => {
         avatar: response.avatar || ''
       }
 
-      // 跳轉回會員頁面 (或者首頁)
-      window.location.href = '/member'
+      // 等待 Cookie 確實寫入後再跳轉
+      await nextTick()
+      await new Promise(resolve => setTimeout(resolve, 100))
+      await navigateTo('/member', { replace: true })
     }
 
   } catch (err) {

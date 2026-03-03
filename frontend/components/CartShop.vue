@@ -101,7 +101,7 @@ const shippingFee = computed(() => {
     remainBoxes -= pkgBoxes
   }
 
-  // 對每一包計算運費
+  // 對每一包計算運費（箱數 或 金額門檻，擇一符合即套用，不重複）
   let fees = packages.map(pkgBoxes => {
     const pkgPrice = pkgBoxes * avgPrice
     if (pkgBoxes >= 4 || pkgPrice >= 2500) return 0
@@ -109,17 +109,57 @@ const shippingFee = computed(() => {
     return 230
   })
 
-  // 滿10盒免一件運費
-  if (totalBoxes >= 10) {
-    let nonZeroFees = fees.filter(fee => fee > 0)
-    if (nonZeroFees.length > 0) {
-      let maxFee = Math.max(...nonZeroFees)
-      let targetIndex = fees.indexOf(maxFee)
-      if (targetIndex !== -1) fees[targetIndex] = 0
+  // 滿額優惠：兩種免運來源取較多者（不重複疊加）
+  //  - 箱數優惠：總箱數 ≥ 10 → ceil(箱數/4) 個免運
+  //  - 金額優惠：每滿 $2,500 → 免 1 個包裹
+  const boxFreeCount = totalBoxes >= 10 ? Math.ceil(totalBoxes / 4) : 0
+  const priceFreeCount = Math.floor(tPrice / 2500)
+  const freeCount = Math.max(boxFreeCount, priceFreeCount)
+
+  if (freeCount > 0) {
+    for (let i = 0; i < Math.min(freeCount, fees.length); i++) {
+      fees[i] = 0
     }
   }
 
   return fees.reduce((sum, fee) => sum + fee, 0)
+})
+
+// 包裹拆分資訊（幾個包裹、幾個免運）
+const packageInfo = computed(() => {
+  const totalBoxes = totalQuantity.value
+  if (totalBoxes === 0) return { total: 0, free: 0 }
+
+  const avgPrice = subtotal.value / totalBoxes
+  let packages = []
+  let remainBoxes = totalBoxes
+
+  while (remainBoxes > 0) {
+    const pkgBoxes = Math.min(4, remainBoxes)
+    packages.push(pkgBoxes)
+    remainBoxes -= pkgBoxes
+  }
+
+  // 計算每包是否免運
+  let fees = packages.map(pkgBoxes => {
+    const pkgPrice = pkgBoxes * avgPrice
+    if (pkgBoxes >= 4 || pkgPrice >= 2500) return 0
+    if (pkgBoxes >= 2 || pkgPrice >= 1250) return 150
+    return 230
+  })
+
+  const boxFree = totalBoxes >= 10 ? Math.ceil(totalBoxes / 4) : 0
+  const priceFree = Math.floor(subtotal.value / 2500)
+  const freeCount = Math.max(boxFree, priceFree)
+
+  if (freeCount > 0) {
+    for (let i = 0; i < Math.min(freeCount, fees.length); i++) {
+      fees[i] = 0
+    }
+  }
+
+  const freePackages = fees.filter(f => f === 0).length
+  return { total: packages.length, free: freePackages }
 })
 
 // 總金額 (小計 + 運費)
@@ -173,7 +213,7 @@ const checkout = () => {
     alert('購物車內目前沒有可結帳的商品')
     return
   }
-  alert(`準備結帳：${formatPrice(totalAmount.value)}`)
+  navigateTo('/checkout')
 }
 </script>
 
@@ -254,6 +294,10 @@ const checkout = () => {
                <span>運費</span>
                <span>{{ formatPrice(shippingFee) }}</span>
              </div>
+             <p class="package_hint" v-if="totalQuantity > 0">
+               📦 共 {{ packageInfo.total }} 件包裹，{{ packageInfo.free }} 件免運
+               <span v-if="packageInfo.total - packageInfo.free > 0">、{{ packageInfo.total - packageInfo.free }} 件需付運費</span>
+             </p>
           </div>
           
           <hr class="summary_divider">
@@ -517,6 +561,13 @@ const checkout = () => {
     margin-bottom: 12px;
     font-size: 0.95rem;
     color: #333;
+}
+
+.package_hint {
+    font-size: 0.8rem;
+    color: #888;
+    margin: -4px 0 0 0;
+    line-height: 1.4;
 }
 
 .summary_divider {

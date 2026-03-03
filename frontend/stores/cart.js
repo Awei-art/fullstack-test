@@ -6,7 +6,13 @@ export const useCartStore = defineStore('cart', {
     // 1. 初始一律給空陣列，確保伺服器與瀏覽器第一時間看到的一樣
     items: [],
     // 側邊小購物車的開關狀態
-    isMiniCartOpen: false
+    isMiniCartOpen: false,
+
+    // 優惠券資訊
+    couponCode: '',
+    discountTitle: '',
+    discountAmount: 0,
+    shippingFee: 150 // 假設固定運費, 可視需求調整
   }),
 
   getters: {
@@ -17,6 +23,12 @@ export const useCartStore = defineStore('cart', {
     // 計算購物車總數量 (顯示在右上角小圖示用)
     totalQty: (state) => {
       return state.items.reduce((total, item) => total + item.quantity, 0)
+    },
+    // 計算最終應付總額
+    finalTotal: (state) => {
+      let calc = state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+      calc = calc - state.discountAmount + state.shippingFee
+      return calc < 0 ? 0 : calc
     }
   },
 
@@ -94,6 +106,28 @@ export const useCartStore = defineStore('cart', {
     },
     closeMiniCart() {
       this.isMiniCartOpen = false
+    },
+    // 清空購物車（結帳成功後使用）
+    clearCart() {
+      this.items = []
+      this.couponCode = ''
+      this.discountTitle = ''
+      this.discountAmount = 0
+      this.saveToLocalStorage()
+    },
+
+    // 設定優惠券
+    setCoupon(code, title, amount) {
+      this.couponCode = code
+      this.discountTitle = title
+      this.discountAmount = amount
+    },
+
+    // 移除優惠券
+    removeCoupon() {
+      this.couponCode = ''
+      this.discountTitle = ''
+      this.discountAmount = 0
     }
   }
 })

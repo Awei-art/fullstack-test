@@ -1,28 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+const config = useRuntimeConfig()
 
-const newsList = [
-    {
-        date: '2026.01.27',
-        title: '春節期間出貨公告',
-        content: '親愛的顧客您好，春節期間（1/28 - 2/2）物流配送可能有所延遲，建議提早下單。2/3起恢復正常出貨，感謝您的支持與配合。'
-    },
-    {
-        date: '2025.12.15',
-        title: '新品「妮娜皇后」限量上市',
-        content: '來自日本的夢幻品種「妮娜皇后」紅葡萄，帶有濃郁的牛奶糖香氣，甜度極高，即日起開放限量預購，請把握機會！'
-    },
-    {
-        date: '2025.11.01',
-        title: '獲得「優良農產品」認證肯定',
-        content: '田原葡萄堅持草生栽培與安全用藥，今年再度獲得國家級優良農產品認證，讓您吃得安心又健康。'
-    },
-    {
-        date: '2025.10.10',
-        title: '官網會員募集中',
-        content: '加入官網會員即贈送$100元購物金，生日當月再享專屬優惠，消費累積點數還可折抵現金！'
-    }
-]
+const newsList = ref([])
+const isLoading = ref(true)
 
 const activeIndex = ref(null)
 
@@ -31,6 +12,40 @@ const toggleNews = (index) => {
         activeIndex.value = null
     } else {
         activeIndex.value = index
+    }
+}
+
+onMounted(async () => {
+    fetchBulletins()
+})
+
+async function fetchBulletins() {
+    try {
+        isLoading.value = true
+        // 注意：這裡使用不需登入憑證的 API
+        const apiBase = process.client ? config.public.apiBaseClient : config.public.apiBase
+        const res = await $fetch(`${apiBase}/bulletins/`)
+        
+        // 建議首頁只顯示最新 4 筆，避免版面過長
+        const limitRes = res.slice(0, 4)
+        
+        // 將資料對應到組件需要的格式
+        newsList.value = limitRes.map(item => {
+            const dateObj = new Date(item.created_at)
+            const year = dateObj.getFullYear()
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+            const day = String(dateObj.getDate()).padStart(2, '0')
+            return {
+                id: item.id,
+                date: `${year}.${month}.${day}`,
+                title: item.title,
+                content: item.content
+            }
+        })
+    } catch (e) {
+        console.error('載入公告失敗:', e)
+    } finally {
+        isLoading.value = false
     }
 }
 </script>
@@ -44,9 +59,12 @@ const toggleNews = (index) => {
                     <h3>快訊 <span class="en_title">Bulletin</span></h3>
                 </div>
                 <div class="news_list">
+                    <div v-if="isLoading" style="padding: 20px; color: #666;">載入中...</div>
+                    <div v-else-if="newsList.length === 0" style="padding: 20px; color: #666;">目前無最新快訊</div>
                     <div 
+                        v-else
                         v-for="(item, index) in newsList" 
-                        :key="index" 
+                        :key="item.id" 
                         class="news_item" 
                         :class="{ active: activeIndex === index }"
                     >

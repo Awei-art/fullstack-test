@@ -19,7 +19,7 @@ const calculatedShipping = computed(() => {
   const baseBoxes = Math.floor(props.totalBoxes / addressCount.value)
   const remainderAddresses = props.totalBoxes % addressCount.value
 
-  // 取得單個盒子的平均金額，以便判斷是否滿足金額門檻 (滿 1250 / 2500)
+  // 取得單個盒子的平均金額，用於金額門檻判斷
   const avgPrice = props.totalPrice / props.totalBoxes
 
   let packages = []
@@ -36,28 +36,27 @@ const calculatedShipping = computed(() => {
     }
   }
 
-  // 2. 對每個包裹個別計算應收運費
+  // 2. 對每個包裹個別計算運費（箱數 或 金額門檻，擇一符合即套用，不重複）
   let fees = packages.map(pkgBoxes => {
     const pkgPrice = pkgBoxes * avgPrice
-    // 滿2500 或 滿4盒 -> 一個地址免運費
+    // 條件一：滿 4 盒 或 該包裹金額 ≥ $2500 → 免運
     if (pkgBoxes >= 4 || pkgPrice >= 2500) return 0
-    // 滿1250 或 滿2盒 -> 運費 150
+    // 條件二：滿 2 盒 或 該包裹金額 ≥ $1250 → 運費 $150
     if (pkgBoxes >= 2 || pkgPrice >= 1250) return 150
-    // 其他 -> 運費 230
+    // 其餘（1 盒且未達 $1250）→ 運費 $230
     return 230
   })
 
-  // 3. 特殊滿額條件：總盒數 >= 10 盒，本來剩下那件需150(或230)直接變成免運
-  if (props.totalBoxes >= 10) {
-    // 找出所有非零的運費包裹
-    let nonZeroFees = fees.filter(fee => fee > 0)
-    if (nonZeroFees.length > 0) {
-      // 找到其中最貴的（通常是 230 或 150）將其折抵掉
-      let maxFee = Math.max(...nonZeroFees)
-      let targetIndex = fees.indexOf(maxFee)
-      if (targetIndex !== -1) {
-        fees[targetIndex] = 0
-      }
+  // 3. 滿額優惠：兩種免運來源取較多者（不重複疊加）
+  //    - 箱數優惠：總箱數 ≥ 10 → 免費包裹數 = ceil(箱數 / 4)
+  //    - 金額優惠：每滿 $2,500 → 免 1 個包裹 = floor(總金額 / 2500)
+  const boxFreeCount = props.totalBoxes >= 10 ? Math.ceil(props.totalBoxes / 4) : 0
+  const priceFreeCount = Math.floor(props.totalPrice / 2500)
+  const freeCount = Math.max(boxFreeCount, priceFreeCount)
+
+  if (freeCount > 0) {
+    for (let i = 0; i < Math.min(freeCount, fees.length); i++) {
+      fees[i] = 0
     }
   }
 
@@ -78,28 +77,22 @@ const minusAddress = () => {
 
 // 產生動態促銷提示訊息
 const promoMessage = computed(() => {
-  if (props.totalBoxes === 0) return '消費滿額或滿 4 盒，即可享一個地址免運優惠！'
+  if (props.totalBoxes === 0) return '消費滿額或滿 4 盒，即可享免運優惠！'
   
   if (calculatedShipping.value === 0) {
-    if (addressCount.value > 1) {
-      return '太棒了！您目前的購買組合已讓所有地址完全免運！'
-    } else {
-      return '已達免運門檻！省下了一筆運費 🎉'
-    }
+    return '已達免運門檻！省下了一筆運費 🎉'
   } else {
-    // 若還有未免運的包裹，提醒差幾盒或差多少錢
-    let remainderBoxes = props.totalBoxes % 4
-    if (remainderBoxes === 0) {
-      return '若要加開更多免運件，請繼續累積盒數或金額！'
-    } else {
-      let diffBoxes = 4 - remainderBoxes
-      // 每盒平均單價若較低，顯示差額會激勵消費
-      let diffPrice = 2500 - ((props.totalPrice / props.totalBoxes) * remainderBoxes)
-      if (diffPrice < 0) diffPrice = 2500 // 防呆
-      
-      let priceStr = Math.round(diffPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      return `【促銷】再買 ${diffBoxes} 盒，或該包裹消費再加 NT$ ${priceStr}，即可再享一包裹免運！`
-    }
+    // 計算距離下一個金額免運門檻還差多少錢
+    const currentPriceFree = Math.floor(props.totalPrice / 2500)
+    const nextPriceThreshold = (currentPriceFree + 1) * 2500
+    const diffPrice = nextPriceThreshold - props.totalPrice
+    const diffPriceStr = Math.round(diffPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
+    // 計算距離下一個箱數免運還差多少盒
+    const remainder = props.totalBoxes % 4
+    const diffBoxes = remainder === 0 ? 4 : 4 - remainder
+
+    return `【促銷】再加 ${diffBoxes} 盒，或消費再加 NT$ ${diffPriceStr}，即可多享一個包裹免運！`
   }
 })
 </script>
@@ -117,6 +110,17 @@ const promoMessage = computed(() => {
     </div>
     
     <div class="calc_body">
+      <div class="calc_row summary_row">
+        <span>購買小計：</span>
+        <strong>NT$ {{ totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</strong>
+      </div>
+      <div class="calc_row summary_row">
+        <span>購買箱數：</span>
+        <strong>{{ totalBoxes }} 箱</strong>
+      </div>
+      
+      <div class="summary_divider"></div>
+
       <div class="calc_row input_group">
         <span>欲寄送的地址數量：</span>
         <div class="qty_control">
@@ -244,6 +248,20 @@ const promoMessage = computed(() => {
   color: #888;
   margin: 0;
   line-height: 1.5;
+}
+
+.summary_row {
+  font-size: 0.95rem;
+}
+
+.summary_row strong {
+  color: #111;
+  font-size: 1rem;
+}
+
+.summary_divider {
+  border-top: 1px dashed #ddd;
+  margin: 12px 0;
 }
 
 .result_row {
