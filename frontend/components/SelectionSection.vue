@@ -29,8 +29,8 @@ const grapes = [
     }
 ]
 
-// Default to index 1 (Sunny/Rain or "陽光雨露") as requested
-const activeIndex = ref(1)
+// Default to index 0 (First Item)
+const activeIndex = ref(0)
 
 const currentGrape = computed(() => {
     return grapes[activeIndex.value]

@@ -8,6 +8,21 @@ class VarietySerializer(serializers.ModelSerializer):
         fields = ['id', 'name'] # 確保有 name 
 
 
+# 品種介紹頁專用（完整資料）
+class VarietyDetailSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Variety
+        fields = ['id', 'name', 'color', 'description', 'image', 'origin', 'flavor', 'season', 'is_active']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+
 # 小圖片的 Serializer
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,6 +90,46 @@ class BulletinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bulletin
         fields = ['id', 'title', 'content', 'start_date', 'end_date', 'created_at']
+
+
+from .models import NewsCategory, News
+
+class NewsCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsCategory
+        fields = ['id', 'name']
+
+
+class NewsListSerializer(serializers.ModelSerializer):
+    """列表頁用（精簡版）"""
+    category_name = serializers.CharField(source='category.name', default='', read_only=True)
+    cover_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = News
+        fields = ['id', 'title', 'summary', 'category_name', 'cover_image', 'published_date', 'is_pinned']
+
+    def get_cover_image(self, obj):
+        request = self.context.get('request')
+        if obj.cover_image:
+            return request.build_absolute_uri(obj.cover_image.url)
+        return None
+
+
+class NewsDetailSerializer(serializers.ModelSerializer):
+    """單篇詳情用"""
+    category_name = serializers.CharField(source='category.name', default='', read_only=True)
+    cover_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = News
+        fields = ['id', 'title', 'summary', 'content', 'category_name', 'cover_image', 'published_date', 'created_at', 'is_pinned']
+
+    def get_cover_image(self, obj):
+        request = self.context.get('request')
+        if obj.cover_image:
+            return request.build_absolute_uri(obj.cover_image.url)
+        return None
 
 # ========================================
 # 優惠券與錢包 Serializers

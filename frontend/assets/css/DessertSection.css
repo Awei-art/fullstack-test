@@ -1,43 +1,82 @@
-/* Dessert Section Styles */
 .dessert_section {
     padding: 60px 0;
     position: relative;
-    z-index: 10;
-    /* Cards sit on top */
+    /* 移除 z-index 以免將內部圖層（背景與卡片）鎖死在同一層級 */
     background-color: transparent;
-    /* Allow purple overlap to show */
 }
 
-/* White background starts lower */
 .dessert_section::before {
     content: "";
     position: absolute;
-    top: 150px;
-    /* Start white background halfway through cards */
+    top: 0;
+    /* 讓白色背景從頂部開始，以填補波浪底下的真空區域 */
     left: 0;
     width: 100%;
     bottom: 0;
     background-color: #fff;
-    z-index: -1;
+    z-index: 0;
+    /* 置底背景層 */
 }
 
 .dessert_container {
-    max-width: 1000px;
-    /* Reduced width to make cards smaller */
+    max-width: 1400px;
+    /* 為了配合版面兩側按鈕加寬 */
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 120px;
+    /* 比照田原精選留白 */
+    position: relative;
+    z-index: 3;
+    /* 使卡片高於上一區塊的紫色波浪(z-index: 1) */
+}
+
+.dessert_carousel_wrap {
+    position: relative;
+    padding: 0 50px;
+    /* 按鈕空間 */
+}
+
+/* 導航按鈕 */
+.dessert_nav {
+    position: absolute;
+    top: 35%;
+    /* 約略在大頭圖的正中間 */
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #dcb15c;
+    color: #dcb15c;
+    font-size: 18px;
     display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: all 0.3s;
+}
+
+.dessert_nav:hover {
+    background-color: #dcb15c;
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(220, 177, 92, 0.4);
+}
+
+.dessert_prev {
+    left: -10px;
+}
+
+.dessert_next {
+    right: -10px;
 }
 
 .dessert_card {
-    flex: 1;
-    min-width: 300px;
+    width: 100%;
     text-align: center;
     /* No border as requested */
     background: transparent;
+    height: 100%;
 }
 
 .dessert_img_wrap {
@@ -108,16 +147,28 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .dessert_container {
-        flex-direction: column;
-        align-items: center;
+        padding: 0 50px;
+    }
+}
+
+@media (max-width: 900px) {
+    .dessert_container {
+        padding: 0 20px;
     }
 
-    .dessert_card {
-        width: 100%;
-        max-width: 400px;
-        /* Limit width on mobile */
-        margin-bottom: 40px;
+    .dessert_nav {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .dessert_prev {
+        left: -5px;
+    }
+
+    .dessert_next {
+        right: -5px;
     }
 }

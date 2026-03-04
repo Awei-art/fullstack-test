@@ -1,0 +1,336 @@
+/* ==============================
+   關於田原 – Page Styles
+   ============================== */
+
+/* ---------- Hero 橫幅 ---------- */
+.about_hero {
+    position: relative;
+    height: 420px;
+    background: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1600&h=600&fit=crop') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.about_hero_overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(93, 64, 55, 0.55), rgba(74, 20, 140, 0.35));
+}
+
+.about_hero_content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: #fff;
+}
+
+.about_hero_title {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 14px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.about_hero_subtitle {
+    font-size: 17px;
+    letter-spacing: 0.08em;
+    opacity: 0.9;
+}
+
+/* ---------- 通用區塊 ---------- */
+.about_section {
+    padding: 90px 0;
+    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+}
+
+.about_section:nth-child(odd) {
+    background-color: #fdfbf7;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+.about_section:nth-child(even) {
+    background-color: #fff;
+}
+
+.about_container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* ---------- 左右排版 ---------- */
+.about_row {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.about_row.reverse {
+    flex-direction: row-reverse;
+}
+
+.about_text_col {
+    flex: 1;
+}
+
+.about_img_col {
+    flex: 1;
+}
+
+/* ---------- 英文小標 ---------- */
+.about_label {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #dcb15c;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* ---------- 中文標題 ---------- */
+.about_heading {
+    font-size: 28px;
+    color: #5d4037;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 25px;
+}
+
+/* ---------- 內文 ---------- */
+.about_paragraph {
+    font-size: 15px;
+    color: #666;
+    line-height: 2;
+    margin-bottom: 18px;
+    letter-spacing: 0.03em;
+}
+
+/* ---------- 圖片 ---------- */
+.about_img_wrap {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(93, 64, 55, 0.12);
+}
+
+.about_img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.about_img_wrap:hover .about_img {
+    transform: scale(1.03);
+}
+
+/* ---------- 農場特色列表 ---------- */
+.about_feature_list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.about_feature_item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.about_feature_icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(220, 177, 92, 0.15), rgba(220, 177, 92, 0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dcb15c;
+    font-size: 20px;
+}
+
+.about_feature_item h4 {
+    font-size: 16px;
+    color: #5d4037;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.about_feature_item p {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.7;
+}
+
+/* ---------- 種植流程 ---------- */
+.about_section_header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.about_subtitle {
+    font-size: 15px;
+    color: #8d6e63;
+    margin-top: -10px;
+}
+
+.about_timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.about_timeline_item {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.about_timeline_item.reverse {
+    flex-direction: row-reverse;
+}
+
+.about_timeline_img_wrap {
+    flex-shrink: 0;
+    width: 380px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(93, 64, 55, 0.10);
+}
+
+.about_timeline_img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.about_timeline_img_wrap:hover .about_timeline_img {
+    transform: scale(1.04);
+}
+
+.about_timeline_content {
+    flex: 1;
+}
+
+.about_timeline_step {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: rgba(220, 177, 92, 0.3);
+    display: block;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.about_timeline_content h4 {
+    font-size: 20px;
+    color: #5d4037;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+}
+
+.about_timeline_content p {
+    font-size: 15px;
+    color: #777;
+    line-height: 1.9;
+}
+
+/* ---------- 農場主人 ---------- */
+.about_owner {
+    background-color: #fdfbf7 !important;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E") !important;
+}
+
+.about_owner_img_wrap {
+    max-width: 400px;
+}
+
+.about_owner_img {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+}
+
+.about_owner_text {
+    padding-left: 20px;
+}
+
+.about_owner_signature {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0d6cc;
+}
+
+.about_owner_signature span {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: #bcaaa4;
+    letter-spacing: 0.05em;
+    font-style: italic;
+}
+
+
+/* ============================
+   RWD 響應式
+   ============================ */
+
+@media (max-width: 900px) {
+    .about_hero {
+        height: 280px;
+    }
+
+    .about_hero_title {
+        font-size: 28px;
+    }
+
+    .about_hero_subtitle {
+        font-size: 14px;
+    }
+
+    .about_section {
+        padding: 60px 0;
+    }
+
+    /* 手機版全部改為上下排列 */
+    .about_row,
+    .about_row.reverse {
+        flex-direction: column;
+        gap: 35px;
+    }
+
+    .about_heading {
+        font-size: 24px;
+    }
+
+    /* 種植流程 */
+    .about_timeline_item,
+    .about_timeline_item.reverse {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .about_timeline_img_wrap {
+        width: 100%;
+    }
+
+    .about_timeline_step {
+        font-size: 28px;
+    }
+
+    .about_timeline_content h4 {
+        font-size: 18px;
+    }
+
+    /* 農場主人 */
+    .about_owner_img_wrap {
+        max-width: 100%;
+    }
+
+    .about_owner_text {
+        padding-left: 0;
+    }
+}

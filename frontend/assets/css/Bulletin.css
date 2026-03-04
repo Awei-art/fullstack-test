@@ -189,6 +189,13 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+
+    /* 讓手機版的波浪平緩一點 */
+    .custom_feature_section::before {
+        clip-path: polygon(0% 1%, 5% 1.6%, 10% 2%, 15% 2%, 20% 1.6%, 25% 1%, 30% 0.4%, 35% 0%, 40% 0%, 45% 0.4%, 50% 1%, 55% 1.6%, 60% 2%, 65% 2%, 70% 1.6%, 75% 1%, 80% 0.4%, 85% 0%, 90% 0%, 95% 0.4%, 100% 1%,
+                100% 99%, 95% 99.6%, 90% 100%, 85% 100%, 80% 99.6%, 75% 99%, 70% 98.4%, 65% 98%, 60% 98%, 55% 98.4%, 50% 99%, 45% 99.6%, 40% 100%, 35% 100%, 30% 99.6%, 25% 99%, 20% 98.4%, 15% 98%, 10% 98%, 5% 98.4%, 0% 99%);
+    }
+
     .custom_container {
         flex-direction: column-reverse;
         /* Put news below or above? Usually important content first. Let's keep promo top or bottom per preference. Let's stack them. */
@@ -199,6 +206,13 @@
     .promo_stack {
         width: 100%;
         max-width: 500px;
+    }
+
+    .news_container {
+        left: 0;
+        /* 在手機平板版面取消向左偏移，使其置中 */
+        margin-top: 20px;
+        /* 縮小在手機上的上方間距 */
     }
 
     .promo_stack {

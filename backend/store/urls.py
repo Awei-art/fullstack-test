@@ -4,12 +4,22 @@ from .views import (
     OrderListCreateView, OrderDetailView,
     ECPayRepayView, ECPayNotifyView, ECPayResultView, ECPayReturnView,
     ValidateCouponView, UserCouponListView, ClaimCouponView,
-    BulletinListAPIView
+    BulletinListAPIView,
+    NewsCategoryListView, NewsListView, NewsDetailView,
+    VarietyListView
 )
 
 urlpatterns = [
     # 公告 API
     path('bulletins/', BulletinListAPIView.as_view(), name='bulletin-list'),
+
+    # 最新消息 API
+    path('news/categories/', NewsCategoryListView.as_view(), name='news-category-list'),
+    path('news/', NewsListView.as_view(), name='news-list'),
+    path('news/<int:pk>/', NewsDetailView.as_view(), name='news-detail'),
+
+    # 品種介紹 API
+    path('varieties/', VarietyListView.as_view(), name='variety-list'),
 
     path('products/', views.get_products, name='get_products'),
 

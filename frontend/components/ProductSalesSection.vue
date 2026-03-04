@@ -11,6 +11,7 @@ const baseURL = process.server ? config.public.apiBase : config.public.apiBaseCl
 // 2. 抓取資料
 const { data: products, pending, error } = await useFetch('/products/', {
   baseURL: baseURL,
+  key: 'sales-products',
   default: () => []
 })
 
@@ -62,16 +63,28 @@ const checkSoldOut = (product) => {
   return false;
 }
 
-// 5. 加入購物車功能 (無縫接軌 ProductDetail)
+// 5. 處理圖片路徑 (解決 SSR 與上線部署後的路徑問題)
+const getImageUrl = (url) => {
+    if (!url) return '/images/default-grape.png'
+    
+    // 從 config 抓取前端呼叫 API 的設定
+    const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
+
+    if (url.startsWith('http://backend:8000')) {
+        return url.replace('http://backend:8000', clientBaseUrl)
+    }
+    if (url.startsWith('/media/')) {
+        return `${clientBaseUrl}${url}`
+    }
+    return url
+}
+
+// 6. 加入購物車功能 (無縫接軌 ProductDetail)
 const addToCart = (product) => {
   if (checkSoldOut(product)) return
 
   // 🔥 解決圖片路徑問題
-  const backendUrl = 'http://127.0.0.1:8000'
-  let safeImage = product.image || '/images/default-grape.png'
-  if (safeImage.startsWith('/media')) {
-    safeImage = backendUrl + safeImage
-  }
+  let safeImage = getImageUrl(product.image)
 
   // 嘗試取得預設等級 (如果有的話)
   let currentGrade = null
@@ -136,7 +149,7 @@ const addToCart = (product) => {
             
             <NuxtLink :to="`/products/${product.id}`" style="display: block; width: 100%; height: 100%;">
               <img 
-                :src="product.image || '/images/default-grape.png'" 
+                :src="getImageUrl(product.image)" 
                 :alt="product.name" 
                 class="product_img"
               >

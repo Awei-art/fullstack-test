@@ -8,8 +8,10 @@
     /* Warm white base */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
     background-repeat: repeat;
-    padding: 60px 0;
-    overflow: hidden;
+    padding: 120px 0 100px;
+    /* 大幅增加上下留白，讓整個區塊變大 */
+    overflow: visible;
+    /* 改為 visible 確保突破邊界的標題不會被切掉一半 */
     color: #5d4037;
     /* Dark Brown for contrast */
     font-family: "Zen Maru Gothic", sans-serif;
@@ -51,16 +53,20 @@
     /* Match Product Title Size */
     color: #5d4037;
     /* Dark Brown */
-    margin-bottom: 20px;
-    margin-top: -30px;
-    /* Move upwards */
-    font-weight: 900;
-    text-shadow: none;
-    /* Remove shadow for cleaner look on light bg */
+    margin-bottom: 140px;
+    /* 增加 70px 的空間，把底下的圖片和其它物件壓得更下面 */
+    margin-top: -130px;
+    /* 在不影響其他人的前提下，把文字再向上拉 50px */
+    font-weight: 700;
+    text-shadow: 0 4px 6px rgba(255, 255, 255, 0.8);
+    /* 加上白色光暈避免字被背景圖吃掉 */
     border-bottom: none;
     /* Darker border */
     padding-bottom: 10px;
     display: inline-block;
+    position: relative;
+    z-index: 50;
+    /* 確保不管下面圖片怎麼飄，標題都在最上層 */
 }
 
 /* Top: Display Area */
@@ -242,11 +248,64 @@
         margin: 40px 0;
     }
 
+    .selection_header {
+        font-size: 24px;
+        /* 與「田原精選系列」手機版大小一致 */
+        margin-bottom: 40px;
+        /* 在手機版大幅縮小與下方圖片的距離 */
+        margin-top: -80px;
+        /* 同步稍微降低上推的幅度避免卡太上去 */
+    }
+
     .display_img {
         max-height: 250px;
     }
 
     .selection_display {
-        height: 300px;
+        height: auto;
+        /* 取消固定高度 */
+        flex-direction: column;
+        /* 垂直排列：圖上、文下 */
+        gap: 20px;
+    }
+
+    .display_info_glass {
+        margin-left: 0;
+        /* 移除與圖片疊合的負邊距 */
+        width: 100%;
+        /* 撐滿螢幕寬度 */
+        flex: none;
+        padding: 20px;
+        /* 手機板縮小內距 */
+    }
+
+    .display_title {
+        font-size: 1.5rem;
+        /* 縮小標題字體 */
+    }
+
+    .display_desc {
+        font-size: 0.95rem;
+        /* 縮小內文字體 */
+        line-height: 1.5;
+        /* 稍微縮小行距讓文字更緊湊 */
+    }
+
+    .selection_choices_row {
+        gap: 8px;
+        /* 縮小按鈕間距 */
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        /* 強制不換行 */
+    }
+
+    .choice_btn {
+        width: calc((100% - 32px) / 5);
+        /* 自動分配5個方塊的寬度 */
+        height: auto;
+        aspect-ratio: 1 / 1;
+        /* 保持1:1正方形 */
+        border-width: 2px;
+        /* 邊框也稍微縮細一點，避免佔用太多空間 */
     }
 }

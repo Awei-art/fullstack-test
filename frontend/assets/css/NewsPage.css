@@ -1,0 +1,326 @@
+/* 最新消息頁面 Styles */
+.news_page {
+    padding: 80px 0 60px;
+    min-height: 80vh;
+    /* 延續網站米白色紙張風格 */
+    background-color: #fdfbf7;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+}
+
+.news_page_container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* 頁面標題 */
+.news_page_header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.news_page_title {
+    font-size: 32px;
+    color: #5d4037;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+}
+
+.news_page_subtitle {
+    font-size: 15px;
+    color: #8d6e63;
+    letter-spacing: 0.05em;
+}
+
+/* 分類 Tab */
+.news_category_tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 50px;
+    border-bottom: 1px solid #e0d6cc;
+}
+
+.news_tab {
+    background: transparent;
+    border: none;
+    padding: 12px 28px;
+    font-size: 15px;
+    color: #8d6e63;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+}
+
+.news_tab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.news_tab:hover {
+    color: #5d4037;
+}
+
+.news_tab.active {
+    color: #dcb15c;
+    font-weight: 700;
+}
+
+.news_tab.active::after {
+    background-color: #dcb15c;
+}
+
+/* 消息列表 */
+.news_list {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* 每則消息 */
+.news_item {
+    display: flex;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #e8e0d8;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+}
+
+.news_item:last-child {
+    border-bottom: none;
+}
+
+.news_item:hover {
+    transform: translateY(-3px);
+}
+
+.news_item:hover .news_item_img {
+    transform: scale(1.03);
+}
+
+/* 封面圖 */
+.news_item_img_wrap {
+    flex-shrink: 0;
+    width: 340px;
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f3e5f5;
+}
+
+.news_item_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.news_item_img_placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    color: #b39ddb;
+    font-size: 40px;
+}
+
+/* 內容區塊 */
+.news_item_body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+/* Meta: 日期 + 分類標籤 */
+.news_item_meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.news_item_date {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    font-family: 'Cinzel', serif;
+    color: #5d4037;
+}
+
+.date_month {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.date_sep {
+    font-size: 20px;
+    color: #bcaaa4;
+    margin: 0 2px;
+}
+
+.date_day {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.news_item_category {
+    font-size: 12px;
+    color: #8d6e63;
+    background: rgba(220, 177, 92, 0.15);
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+}
+
+.news_item_pinned {
+    font-size: 12px;
+    color: #dcb15c;
+    background: rgba(220, 177, 92, 0.12);
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* 標題 */
+.news_item_title {
+    font-size: 20px;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+}
+
+/* 摘要 */
+.news_item_summary {
+    font-size: 14px;
+    color: #777;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 詳細介紹按鈕 */
+.news_item_more {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #8d6e63;
+    padding: 8px 0;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.news_item_more i {
+    transition: transform 0.3s ease;
+}
+
+.news_item:hover .news_item_more {
+    color: #dcb15c;
+    border-bottom-color: #dcb15c;
+}
+
+.news_item:hover .news_item_more i {
+    transform: translateX(5px);
+}
+
+/* 載入中 */
+.news_loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #8d6e63;
+    font-size: 16px;
+}
+
+/* 無資料 */
+.news_empty {
+    text-align: center;
+    padding: 80px 0;
+    color: #bcaaa4;
+}
+
+.news_empty i {
+    font-size: 48px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.news_empty p {
+    font-size: 16px;
+}
+
+/* ===== RWD ===== */
+
+@media (max-width: 900px) {
+    .news_page {
+        padding: 60px 0 40px;
+    }
+
+    .news_page_title {
+        font-size: 24px;
+    }
+
+    .news_category_tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        padding-bottom: 0;
+        margin-bottom: 35px;
+        gap: 0;
+    }
+
+    .news_tab {
+        white-space: nowrap;
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+
+    /* 手機版：圖片在上，文字在下 */
+    .news_item {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .news_item_img_wrap {
+        width: 100%;
+    }
+
+    .news_item_body {
+        padding: 0;
+    }
+
+    .date_month,
+    .date_day {
+        font-size: 22px;
+    }
+
+    .news_item_title {
+        font-size: 18px;
+    }
+}

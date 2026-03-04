@@ -3,21 +3,22 @@ from django.contrib import admin
 
 # 品種表
 class Variety(models.Model):
-    # 1. ID 欄位：Django 會自動幫你建立 (AutoField)，所以「不用」寫出來！
-    
-    # 2. 品種名稱
-    name = models.CharField(max_length=100, verbose_name="品種名稱") 
-    
-    # 3. 顏色 (建議這之後可以改用選項 Select，目前先用文字輸入沒問題)
-    color = models.CharField(max_length=50, verbose_name="顏色")    
-    
-    # 4. 品種介紹 
-    # 使用 TextField 因為介紹文字通常比較長
-    # blank=True 代表後台新增時，這個欄位可以留空不填
-    description = models.TextField(blank=True, verbose_name="品種介紹") 
-
-    # 5. 這個欄位控制這個品種現在有沒有貨
+    name = models.CharField(max_length=100, verbose_name="品種名稱")
+    color = models.CharField(max_length=50, verbose_name="顏色")
+    description = models.TextField(blank=True, verbose_name="品種介紹")
     is_active = models.BooleanField(default=True, verbose_name="是否有貨")
+
+    # ===== 品種介紹頁用的新欄位 =====
+    image = models.ImageField(upload_to='variety_images/', blank=True, null=True, verbose_name="品種圖片", help_text="品種介紹頁用的大圖")
+    origin = models.CharField(max_length=100, blank=True, verbose_name="產地/來源", help_text="例如：日本岡山、台灣彰化")
+    flavor = models.CharField(max_length=200, blank=True, verbose_name="風味特色", help_text="例如：甜度高、帶有玫瑰香氣")
+    season = models.CharField(max_length=50, blank=True, verbose_name="產季", help_text="例如：6~8月")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="排序權重", help_text="數字越大越排在前面")
+
+    class Meta:
+        ordering = ['-sort_order', 'id']
+        verbose_name = "葡萄品種"
+        verbose_name_plural = "葡萄品種管理"
 
     def __str__(self):
         return self.name
@@ -420,6 +421,52 @@ class Bulletin(models.Model):
         ordering = ['-sort_order', '-created_at']
         verbose_name = "網站公告"
         verbose_name_plural = "網站公告管理"
+
+    def __str__(self):
+        return self.title
+
+
+# ========================================
+# 最新消息系統
+# ========================================
+
+class NewsCategory(models.Model):
+    """最新消息分類（可於後台自由新增）"""
+    name = models.CharField(max_length=50, unique=True, verbose_name="分類名稱")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="排序權重", help_text="數字越大越排在前面")
+
+    class Meta:
+        ordering = ['-sort_order', 'id']
+        verbose_name = "消息分類"
+        verbose_name_plural = "消息分類管理"
+
+    def __str__(self):
+        return self.name
+
+
+class News(models.Model):
+    """最新消息"""
+    category = models.ForeignKey(
+        NewsCategory,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='news_items',
+        verbose_name="分類"
+    )
+    title = models.CharField(max_length=200, verbose_name="標題")
+    summary = models.CharField(max_length=300, blank=True, verbose_name="摘要文字", help_text="列表頁顯示的簡短說明")
+    content = models.TextField(verbose_name="詳細內容")
+    cover_image = models.ImageField(upload_to='news_images/', blank=True, null=True, verbose_name="封面圖片")
+    is_published = models.BooleanField(default=True, verbose_name="是否發佈")
+    is_pinned = models.BooleanField(default=False, verbose_name="是否置頂", help_text="勾選後會置頂在列表最上方")
+    published_date = models.DateField(verbose_name="發佈日期")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新時間")
+
+    class Meta:
+        ordering = ['-is_pinned', '-published_date', '-created_at']
+        verbose_name = "最新消息"
+        verbose_name_plural = "最新消息管理"
 
     def __str__(self):
         return self.title

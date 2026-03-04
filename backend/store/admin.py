@@ -1,19 +1,14 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News
 # Register your models here.
 
 #定義品種頁 顯示有貨
 @admin.register(Variety)
 class VarietyAdmin(admin.ModelAdmin):
-    # 1. 把您想看的欄位列出來 (is_active 一定要放進來)
-    list_display = ('name', 'is_active') 
-    
-    # 2. 設定這個欄位可以直接在列表上編輯
-    # 注意：這裡只能放 list_display 裡面有的欄位
-    list_editable = ('is_active',) 
-
-    # (選用) 讓 id 或 name 可以點擊進入詳細頁
+    list_display = ('name', 'color', 'origin', 'season', 'is_active', 'sort_order')
+    list_editable = ('is_active', 'sort_order')
     list_display_links = ('name',)
+    search_fields = ('name', 'origin', 'flavor')
 
     
 #產品詳細圖
@@ -90,3 +85,23 @@ class BulletinAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
     list_editable = ('is_active', 'sort_order')
     ordering = ('-sort_order', '-created_at')
+
+
+# ========================================
+# 最新消息管理 Admin
+# ========================================
+
+@admin.register(NewsCategory)
+class NewsCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sort_order')
+    list_editable = ('sort_order',)
+    search_fields = ('name',)
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'is_pinned', 'published_date', 'is_published', 'created_at')
+    list_filter = ('is_published', 'is_pinned', 'category', 'published_date')
+    search_fields = ('title', 'summary', 'content')
+    list_editable = ('is_published', 'is_pinned')
+    ordering = ('-is_pinned', '-published_date', '-created_at')

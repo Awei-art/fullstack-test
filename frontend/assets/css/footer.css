@@ -161,6 +161,15 @@
         flex-direction: column;
         text-align: center;
         gap: 30px;
+        align-items: center;
+        /* 讓內部子區塊水平置中 */
+    }
+
+    .footer_col {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .footer_info {
@@ -188,5 +197,6 @@
 
     .footer_sns {
         padding-right: 0;
+        align-items: center;
     }
 }

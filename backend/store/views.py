@@ -8,9 +8,11 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import Product, Order, Bulletin
+from .models import Product, Order, Bulletin, NewsCategory, News, Variety
 from .serializers import (
-    ProductSerializer, OrderSerializer, OrderListSerializer, CreateOrderSerializer, BulletinSerializer
+    ProductSerializer, OrderSerializer, OrderListSerializer, CreateOrderSerializer, BulletinSerializer,
+    NewsCategorySerializer, NewsListSerializer, NewsDetailSerializer,
+    VarietyDetailSerializer
 )
 from .ecpay import create_ecpay_payment, verify_check_mac_value
 import logging
@@ -19,8 +21,20 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
+
 # ========================================
-# 網站公告 API
+# 品種介紹 API
+# ========================================
+
+class VarietyListView(generics.ListAPIView):
+    """GET /api/varieties/ — 回傳所有有貨品種的完整資料"""
+    serializer_class = VarietyDetailSerializer
+    permission_classes = [AllowAny]
+    queryset = Variety.objects.filter(is_active=True)
+
+
+# ========================================
+# 網站快訊 API
 # ========================================
 class BulletinListAPIView(generics.ListAPIView):
     """
@@ -40,6 +54,37 @@ class BulletinListAPIView(generics.ListAPIView):
         ).filter(
             Q(end_date__isnull=True) | Q(end_date__gte=now)
         )
+
+
+# ========================================
+# 最新消息 API
+# ========================================
+
+class NewsCategoryListView(generics.ListAPIView):
+    """GET /api/news/categories/ — 回傳所有消息分類"""
+    serializer_class = NewsCategorySerializer
+    permission_classes = [AllowAny]
+    queryset = NewsCategory.objects.all()
+
+
+class NewsListView(generics.ListAPIView):
+    """GET /api/news/ — 回傳已發佈的最新消息列表（可選分類篩選）"""
+    serializer_class = NewsListSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        qs = News.objects.filter(is_published=True).select_related('category')
+        category_id = self.request.query_params.get('category')
+        if category_id:
+            qs = qs.filter(category_id=category_id)
+        return qs
+
+
+class NewsDetailView(generics.RetrieveAPIView):
+    """GET /api/news/<pk>/ — 回傳單篇消息詳情"""
+    serializer_class = NewsDetailSerializer
+    permission_classes = [AllowAny]
+    queryset = News.objects.filter(is_published=True).select_related('category')
 
 @api_view(['GET'])
 def get_products(request):

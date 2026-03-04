@@ -25,6 +25,24 @@ const openMiniCart = (e) => {
 const isMenuOpen = ref(false)
 const headerRef = ref(null)
 
+const isUserMenuOpen = ref(false)
+const userMenuRef = ref(null)
+
+const handleUserMenuClick = (e) => {
+    // 只有在手機版才防止直接跳轉並顯示選單
+    if (window.innerWidth <= 900) {
+        isUserMenuOpen.value = !isUserMenuOpen.value
+    } else {
+        // 桌機板直接跳轉會員中心
+        closeUserMenu()
+        navigateTo('/member')
+    }
+}
+
+const closeUserMenu = () => {
+    isUserMenuOpen.value = false
+}
+
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value
 }
@@ -37,6 +55,10 @@ const handleClickOutside = (event) => {
     // If menu is open and click is outside the header, close the menu
     if (isMenuOpen.value && headerRef.value && !headerRef.value.contains(event.target)) {
         closeMenu()
+    }
+    // Handle user menu click outside
+    if (isUserMenuOpen.value && userMenuRef.value && !userMenuRef.value.contains(event.target)) {
+        closeUserMenu()
     }
 }
 
@@ -67,12 +89,12 @@ onUnmounted(() => {
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="#" class="menu_link">
+                        <NuxtLink to="/news" class="menu_link">
                             <span>最新消息</span>
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="#" class="menu_link">
+                        <NuxtLink to="/about" class="menu_link">
                             <span>關於田原</span>
                         </NuxtLink>
                     </li>
@@ -82,7 +104,7 @@ onUnmounted(() => {
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="#" class="menu_link">
+                        <NuxtLink to="/varieties" class="menu_link">
                             <span>品種介紹</span>
                         </NuxtLink>
                     </li>
@@ -112,17 +134,28 @@ onUnmounted(() => {
                     </svg>
                 </NuxtLink>
                 <!-- 登入後顯示會員頭貼 -->
-                <NuxtLink v-else to="/member" class="btn_login logged-in">
-                    <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="header-avatar">
-                    <svg v-else class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
-                        stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span class="btn_text user-name">{{ userCookie.username || '會員中心' }}</span>
-                </NuxtLink>
-                <!-- 登出按鈕 (登入後才有) -->
-                <button v-if="userCookie" @click="handleLogout" class="header-logout-btn">
+                <div v-else class="header-user-wrapper" ref="userMenuRef">
+                    <a href="#" class="btn_login logged-in" @click.prevent="handleUserMenuClick">
+                        <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="header-avatar">
+                        <svg v-else class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span class="btn_text user-name desktop-only">{{ userCookie.username || '會員中心' }}</span>
+                    </a>
+
+                    <!-- 手機版的頭像下拉選單 -->
+                    <transition name="fade">
+                        <div v-show="isUserMenuOpen" class="mobile-user-dropdown">
+                            <NuxtLink to="/member" class="dropdown-link" @click="closeUserMenu">會員中心</NuxtLink>
+                            <button @click="handleLogout" class="dropdown-link text-danger">登出</button>
+                        </div>
+                    </transition>
+                </div>
+                
+                <!-- 登出按鈕 (登入後才有，且只在桌機版顯示) -->
+                <button v-if="userCookie" @click="handleLogout" class="header-logout-btn desktop-only">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
@@ -232,23 +265,83 @@ onUnmounted(() => {
     border-color: var(--grape-primary);
 }
 
+.header-user-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-user-dropdown {
+    display: none; /* 預設不顯示，由媒體查詢與 v-show 共同控制 */
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 120px;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* Add an active state for the user head */
+.btn_login.logged-in:active {
+    opacity: 0.6;
+}
+
+.dropdown-link {
+    display: block;
+    padding: 12px 16px;
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.dropdown-link:last-child {
+    border-bottom: none;
+}
+
+.dropdown-link.text-danger {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
 @media (max-width: 900px) {
-    /* 在手機版隱藏文字只顯示圖示 */
-    .header-logout-btn {
-        width: 36px;
-        height: 36px;
-        padding: 5px;
-        border: none;
-        border-radius: 8px; /* 手機版也從圓圈改為微圓角的方型 */
-        color: var(--grape-primary);
-        justify-content: center;
-        text-indent: 100%;
-        white-space: nowrap;
-        overflow: hidden;
+    /* 隱藏桌機版專屬按鈕與文字 */
+    .desktop-only {
+        display: none !important;
     }
-    .header-logout-btn svg {
-        text-indent: 0;
-        position: absolute;
+
+    /* 手機版才讓 dropdown 能以 flex 呈現 */
+    .mobile-user-dropdown {
+        display: flex;
+    }
+
+    /* 放大手機版的購物車與頭像圖示 */
+    .btn_cart {
+        margin-right: 15px; /* 控制購物車向左退 (數字越大退越多) */
+    }
+
+    .btn_cart svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .header-avatar {
+        width: 38px;
+        height: 38px;
+    }
+
+    .icon_user {
+        width: 28px;
+        height: 28px;
     }
 }
 </style>
