@@ -32,6 +32,29 @@ const placeholderImages = [
 ]
 const getPlaceholder = (index) => placeholderImages[index % placeholderImages.length]
 
+// 中文顏色名稱 → 蠟筆風 CSS 色碼對應表
+const colorMap = {
+    '紫黑色': '#5c4a6e',
+    '紫色': '#9b7bb8',
+    '深紫色': '#7b5ea0',
+    '紅寶石色': '#d4726a',
+    '紅色': '#ea344f',
+    '深紅色': '#b85c5c',
+    '玫瑰紅': '#e8879b',
+    '翠綠色': '#8ec89a',
+    '綠色': '#9dc94f',
+    '黃綠色': '#c8d47a',
+    '金黃色': '#edc96a',
+    '黑色': '#4a4a52',
+    '粉紅色': '#f0a8b8',
+    '白色': '#ede8d0',
+}
+
+const getColorCss = (colorName) => {
+    if (!colorName) return '#b39ddb'
+    return colorMap[colorName] || '#b39ddb'
+}
+
 // 目前顯示模式
 const viewMode = ref('grid') // 'grid' | 'detail'
 </script>
@@ -76,7 +99,7 @@ const viewMode = ref('grid') // 'grid' | 'detail'
                             </div>
                             <div class="variety_card_body">
                                 <div class="variety_card_tags">
-                                    <span class="variety_card_color" :style="{ backgroundColor: v.color || '#b39ddb' }"></span>
+                                    <span class="variety_card_color" :style="{ backgroundColor: getColorCss(v.color) }"></span>
                                     <span v-if="v.origin" class="variety_card_origin">{{ v.origin }}</span>
                                 </div>
                                 <h3 class="variety_card_name">{{ v.name }}</h3>

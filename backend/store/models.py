@@ -25,8 +25,27 @@ class Variety(models.Model):
 
 
 
+# 商品分類表
+class ProductCategory(models.Model):
+    """商品分類（單品種禮盒、混搭禮盒、季節限定等）"""
+    name = models.CharField(max_length=100, verbose_name="分類名稱")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="排序權重", help_text="數字越大越排在前面")
+    is_active = models.BooleanField(default=True, verbose_name="是否顯示", help_text="關閉後前台分類Tab不會出現")
+
+    class Meta:
+        ordering = ['-sort_order', 'id']
+        verbose_name = "葡萄禮盒分類"
+        verbose_name_plural = "葡萄禮盒分類管理"
+
+    def __str__(self):
+        return self.name
+
+
 # ---  Product (商品表) ---
 class Product(models.Model):
+    # 0. 商品分類
+    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products', verbose_name="商品分類")
+
     # 1. 商品名稱 (e.g. 三色葡萄禮盒)
     name = models.CharField(max_length=100, verbose_name="商品名稱")
     
@@ -89,6 +108,10 @@ class Product(models.Model):
         # 如果是整數 (如 4.0) 就顯示 4，不然顯示 4.5
         value = int(self.unit_value) if self.unit_value % 1 == 0 else self.unit_value
         return f"{value} {unit_display}"
+
+    class Meta:
+        verbose_name = "葡萄禮盒"
+        verbose_name_plural = "葡萄禮盒管理"
 
     def __str__(self):
         return self.name
@@ -419,8 +442,8 @@ class Bulletin(models.Model):
 
     class Meta:
         ordering = ['-sort_order', '-created_at']
-        verbose_name = "網站公告"
-        verbose_name_plural = "網站公告管理"
+        verbose_name = "首頁快訊"
+        verbose_name_plural = "首頁快訊管理"
 
     def __str__(self):
         return self.title
@@ -470,3 +493,68 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# ========================================
+# 甜點系統
+# ========================================
+
+class DessertCategory(models.Model):
+    """甜點分類（如大福、銅鑼燒等）"""
+    name = models.CharField(max_length=100, verbose_name="分類名稱")
+    image = models.ImageField(upload_to='dessert_images/', blank=True, null=True, verbose_name="分類封面圖")
+    description = models.TextField(blank=True, verbose_name="分類簡介")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="排序權重", help_text="數字越大越排在前面")
+    is_active = models.BooleanField(default=True, verbose_name="是否啟用")
+
+    class Meta:
+        ordering = ['-sort_order', 'id']
+        verbose_name = "甜點分類"
+        verbose_name_plural = "甜點分類管理"
+
+    def __str__(self):
+        return self.name
+
+
+class Dessert(models.Model):
+    """個別甜點品項（如草莓大福、水蜜桃大福）"""
+    category = models.ForeignKey(DessertCategory, on_delete=models.CASCADE, related_name='desserts', verbose_name="所屬分類")
+    name = models.CharField(max_length=100, verbose_name="品項名稱", help_text="例如：草莓大福")
+    flavor = models.CharField(max_length=50, verbose_name="口味", help_text="例如：草莓")
+    price = models.PositiveIntegerField(verbose_name="售價")
+    image = models.ImageField(upload_to='dessert_images/', blank=True, null=True, verbose_name="品項圖片")
+    description = models.TextField(blank=True, verbose_name="品項介紹")
+    stock = models.PositiveIntegerField(default=0, verbose_name="庫存數量")
+    is_active = models.BooleanField(default=True, verbose_name="是否上架")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="排序權重", help_text="數字越大越排在前面")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新時間")
+
+    class Meta:
+        ordering = ['-sort_order', 'id']
+        verbose_name = "甜點品項"
+        verbose_name_plural = "甜點品項管理"
+
+    def __str__(self):
+        return f"{self.name}（{self.category.name}）"
+
+class DessertGrade(models.Model):
+    """甜點規格/等級 (例如：6顆裝 $480, 9顆裝 $720)"""
+    dessert = models.ForeignKey(
+        Dessert,
+        on_delete=models.CASCADE,
+        related_name='grades',
+        verbose_name="所屬甜點"
+    )
+    name = models.CharField(max_length=50, verbose_name="規格名稱", help_text="例如：6顆裝")
+    count = models.PositiveIntegerField(default=1, verbose_name="數量(顆)", help_text="如果是6顆裝就填6")
+    price = models.IntegerField(verbose_name="價格(整盒)")
+    stock = models.IntegerField(default=0, verbose_name="此規格庫存(盒)")
+    
+    class Meta:
+        verbose_name = "甜點規格"
+        verbose_name_plural = "甜點規格管理"
+        ordering = ['price']
+
+    def __str__(self):
+        return f"{self.dessert.name} - {self.name} (NT${self.price})"

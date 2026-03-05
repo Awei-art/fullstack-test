@@ -174,11 +174,27 @@
 }
 
 .variety_card_color {
-    width: 14px;
-    height: 14px;
+    position: relative;
+    width: 16px;
+    height: 18px;
+    border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+    border: none;
+    box-shadow:
+        inset -1px -2px 3px rgba(0, 0, 0, 0.25),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.variety_card_color::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, transparent 70%);
     border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .variety_card_origin {

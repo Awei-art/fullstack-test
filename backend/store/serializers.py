@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon
+from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade
 
 #選擇品種回傳前端格式
 class VarietySerializer(serializers.ModelSerializer):
     class Meta:
         model = Variety
-        fields = ['id', 'name'] # 確保有 name 
+        fields = ['id', 'name', 'color'] # 確保有 name 和 color 
 
 
 # 品種介紹頁專用（完整資料）
@@ -37,6 +37,13 @@ class ProductGradeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price', 'stock']
 
 
+
+class ProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ['id', 'name']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     # 為了讓前端直接拿到完整的圖片網址，我們需要特別處理 image
     image = serializers.SerializerMethodField()
@@ -63,7 +70,8 @@ class ProductSerializer(serializers.ModelSerializer):
         'unit_value',   # 數值 (4)
         'spec_display', # 組合好的 (4 台斤)
         'mix_limit',    # 混合上限
-        'grades', # 等級 庫存 價格
+        'grades',       # 等級 庫存 價格
+        'category',     # 分類 ID
         ]
         
 
@@ -410,3 +418,42 @@ class CreateOrderSerializer(serializers.Serializer):
                 item_info['product'].save()
 
         return order
+
+
+# ========================================
+# 甄點 Serializers
+# ========================================
+
+class DessertCategorySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DessertCategory
+        fields = ['id', 'name', 'image', 'description']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+
+class DessertGradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DessertGrade
+        fields = ['id', 'name', 'count', 'price', 'stock']
+
+class DessertSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    grades = DessertGradeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Dessert
+        fields = ['id', 'category', 'category_name', 'name', 'flavor', 'price', 'image', 'description', 'stock', 'is_active', 'grades']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None

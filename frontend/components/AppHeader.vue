@@ -51,6 +51,15 @@ const closeMenu = () => {
     isMenuOpen.value = false
 }
 
+// 手機版子選單展開
+const toggleSubmenu = (e) => {
+    if (window.innerWidth <= 900) {
+        e.preventDefault()
+        const li = e.currentTarget.closest('.has_submenu')
+        if (li) li.classList.toggle('open')
+    }
+}
+
 const handleClickOutside = (event) => {
     // If menu is open and click is outside the header, close the menu
     if (isMenuOpen.value && headerRef.value && !headerRef.value.contains(event.target)) {
@@ -98,10 +107,22 @@ onUnmounted(() => {
                             <span>關於田原</span>
                         </NuxtLink>
                     </li>
-                    <li class="node1">
-                        <NuxtLink to="/products" class="menu_link">
-                            <span>葡萄商店</span>
-                        </NuxtLink>
+                    <li class="node1 has_submenu">
+                        <a href="#" class="menu_link" @click.prevent="toggleSubmenu">
+                            <span>線上商店</span>
+                        </a>
+                        <ul class="submenu">
+                            <li>
+                                <NuxtLink to="/products" class="menu_link" @click="closeMenu">
+                                    <span>葡萄禮盒</span>
+                                </NuxtLink>
+                            </li>
+                            <li>
+                                <NuxtLink to="/desserts" class="menu_link" @click="closeMenu">
+                                    <span>甜點專區</span>
+                                </NuxtLink>
+                            </li>
+                        </ul>
                     </li>
                     <li class="node1">
                         <NuxtLink to="/varieties" class="menu_link">

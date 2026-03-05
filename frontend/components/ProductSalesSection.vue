@@ -5,15 +5,30 @@ const cartStore = useCartStore()
 
 // 1. 設定後端 API 網址
 const config = useRuntimeConfig()
-// 關鍵：如果是伺服器端抓資料用內部網址，如果是瀏覽器端抓資料用外部網址
 const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient
 
-// 2. 抓取資料
-const { data: products, pending, error } = await useFetch('/products/', {
+// 接收父頁面的分類篩選
+const activeCategory = inject('activeCategory', ref(null))
+const activeColor = inject('activeColor', ref(null))
+
+// 2. 抓取資料（支援分類 + 顏色篩選）
+const { data: products, pending, error, execute } = await useFetch('/products/', {
   baseURL: baseURL,
   key: 'sales-products',
-  default: () => []
+  default: () => [],
+  query: computed(() => {
+    const q = {}
+    if (activeCategory.value) q.category = activeCategory.value
+    if (activeColor.value) q.color = activeColor.value
+    return q
+  }),
+  watch: false // 關閉預設的 watch，我們自己手動控制
 })
+
+// 確實監聽分類與顏色的變化，然後強制發送新 Request
+watch([activeCategory, activeColor], () => {
+  execute()
+}, { deep: true })
 
 // 3. 處理金額千分位 (例如 1200 變 1,200)
 const formatPrice = (price) => {
@@ -129,7 +144,6 @@ const addToCart = (product) => {
 <template>
   <section class="grape_sales_section">
     <div class="grape_sales_container">
-      <h2 class="grape_sales_title">精選葡萄禮盒</h2>
 
       <div v-if="pending">載入中...</div>
       

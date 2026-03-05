@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade
 # Register your models here.
 
 #定義品種頁 顯示有貨
@@ -10,7 +10,14 @@ class VarietyAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name', 'origin', 'flavor')
 
-    
+
+@admin.register(ProductCategory)
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'sort_order')
+    list_editable = ('is_active', 'sort_order')
+    list_display_links = ('name',)
+
+
 #產品詳細圖
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -29,8 +36,9 @@ class ProductGradeInline(admin.TabularInline):
 # 這裡用一個比較進階的寫法，讓您在列表就能看到價格和庫存
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock', 'is_mixed', 'get_spec_display', 'mix_limit') # 列表頁顯示這幾欄
-    list_editable = ('mix_limit',) # 👈 讓您可以直接在列表改數字，不用點進去
+    list_display = ('name', 'category', 'price', 'stock', 'is_mixed', 'get_spec_display', 'mix_limit')
+    list_editable = ('mix_limit',)
+    list_filter = ('category',)
     filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
     filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
     #放在同一個頁面最下方
@@ -105,3 +113,27 @@ class NewsAdmin(admin.ModelAdmin):
     search_fields = ('title', 'summary', 'content')
     list_editable = ('is_published', 'is_pinned')
     ordering = ('-is_pinned', '-published_date', '-created_at')
+
+
+# ========================================
+# 甄點管理
+# ========================================
+
+@admin.register(DessertCategory)
+class DessertCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'sort_order')
+    list_editable = ('is_active', 'sort_order')
+    list_display_links = ('name',)
+
+class DessertGradeInline(admin.TabularInline):
+    model = DessertGrade
+    extra = 1
+
+@admin.register(Dessert)
+class DessertAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'flavor', 'price', 'stock', 'is_active', 'sort_order')
+    list_filter = ('category', 'is_active')
+    list_editable = ('price', 'stock', 'is_active', 'sort_order')
+    list_display_links = ('name',)
+    search_fields = ('name', 'flavor')
+    inlines = [DessertGradeInline]

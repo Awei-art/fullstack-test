@@ -8,11 +8,13 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import Product, Order, Bulletin, NewsCategory, News, Variety
+from .models import Product, Order, Bulletin, NewsCategory, News, Variety, DessertCategory, Dessert, ProductCategory
 from .serializers import (
     ProductSerializer, OrderSerializer, OrderListSerializer, CreateOrderSerializer, BulletinSerializer,
     NewsCategorySerializer, NewsListSerializer, NewsDetailSerializer,
-    VarietyDetailSerializer
+    VarietyDetailSerializer,
+    DessertCategorySerializer, DessertSerializer,
+    ProductCategorySerializer
 )
 from .ecpay import create_ecpay_payment, verify_check_mac_value
 import logging
@@ -27,10 +29,41 @@ logger = logging.getLogger(__name__)
 # ========================================
 
 class VarietyListView(generics.ListAPIView):
-    """GET /api/varieties/ — 回傳所有有貨品種的完整資料"""
+    """GET /api/varieties/ — 回傳所有的品種資料（不限是否有貨）"""
     serializer_class = VarietyDetailSerializer
     permission_classes = [AllowAny]
-    queryset = Variety.objects.filter(is_active=True)
+    queryset = Variety.objects.all()
+
+
+# ========================================
+# 甄點 API
+# ========================================
+
+class DessertCategoryListView(generics.ListAPIView):
+    """GET /api/desserts/categories/ — 甄點分類列表"""
+    serializer_class = DessertCategorySerializer
+    permission_classes = [AllowAny]
+    queryset = DessertCategory.objects.filter(is_active=True)
+
+
+class DessertListView(generics.ListAPIView):
+    """GET /api/desserts/ — 甄點品項列表（支援 ?category=ID 篩選）"""
+    serializer_class = DessertSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        qs = Dessert.objects.filter(is_active=True).select_related('category')
+        category_id = self.request.query_params.get('category')
+        if category_id:
+            qs = qs.filter(category_id=category_id)
+        return qs
+
+
+class DessertDetailView(generics.RetrieveAPIView):
+    """GET /api/desserts/<id>/ — 單一甄點詳情"""
+    serializer_class = DessertSerializer
+    permission_classes = [AllowAny]
+    queryset = Dessert.objects.filter(is_active=True).select_related('category')
 
 
 # ========================================
@@ -88,10 +121,25 @@ class NewsDetailView(generics.RetrieveAPIView):
 
 @api_view(['GET'])
 def get_products(request):
-    # 只抓有庫存的商品，或者您可以拿掉 filter 抓全部
-    products = Product.objects.all() 
+    products = Product.objects.all()
+    # 支援 ?category=ID 篩選
+    category_id = request.query_params.get('category')
+    if category_id:
+        products = products.filter(category_id=category_id)
+    # 支援 ?color=顏色名稱 篩選（透過品種的 color 欄位）
+    color = request.query_params.get('color')
+    if color:
+        products = products.filter(varieties__color=color).distinct()
     serializer = ProductSerializer(products, many=True, context={'request': request})
     return Response(serializer.data)
+
+
+class ProductCategoryListView(generics.ListAPIView):
+    """GET /api/products/categories/ — 商品分類列表"""
+    serializer_class = ProductCategorySerializer
+    permission_classes = [AllowAny]
+    queryset = ProductCategory.objects.filter(is_active=True)
+
 
 @api_view(['GET'])
 def get_product(request, pk):

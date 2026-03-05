@@ -6,7 +6,9 @@ from .views import (
     ValidateCouponView, UserCouponListView, ClaimCouponView,
     BulletinListAPIView,
     NewsCategoryListView, NewsListView, NewsDetailView,
-    VarietyListView
+    VarietyListView,
+    DessertCategoryListView, DessertListView, DessertDetailView,
+    ProductCategoryListView
 )
 
 urlpatterns = [
@@ -21,6 +23,13 @@ urlpatterns = [
     # 品種介紹 API
     path('varieties/', VarietyListView.as_view(), name='variety-list'),
 
+    # 甄點 API
+    path('desserts/categories/', DessertCategoryListView.as_view(), name='dessert-category-list'),
+    path('desserts/', DessertListView.as_view(), name='dessert-list'),
+    path('desserts/<int:pk>/', DessertDetailView.as_view(), name='dessert-detail'),
+
+    # 商品分類 API
+    path('products/categories/', ProductCategoryListView.as_view(), name='product-category-list'),
     path('products/', views.get_products, name='get_products'),
 
     # 單一商品詳情
