@@ -41,7 +41,7 @@ class ProductCategory(models.Model):
         return self.name
 
 
-# ---  Product (商品表) ---
+# ---  葡萄商品表 ---
 class Product(models.Model):
     # 0. 商品分類
     category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products', verbose_name="商品分類")
@@ -398,10 +398,19 @@ class OrderItem(models.Model):
         related_name='items', verbose_name="所屬訂單"
     )
 
-    # 商品關聯 (SET_NULL: 商品被刪除時，訂單記錄仍保留)
+    # 品項類型 (用來區分是葡萄還是甜點)
+    item_type = models.CharField(max_length=20, default='product', verbose_name="品項分類")
+
+    # 葡萄關聯 (SET_NULL: 商品被刪除時，訂單記錄仍保留)
     product = models.ForeignKey(
         Product, on_delete=models.SET_NULL,
-        null=True, blank=True, verbose_name="商品"
+        null=True, blank=True, verbose_name="葡萄商品"
+    )
+
+    # 甜點關聯 (SET_NULL: 甜點被刪除時，訂單記錄仍保留)
+    dessert = models.ForeignKey(
+        'Dessert', on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="甜點商品"
     )
 
     # === 商品快照 (下單當下的資訊，永不改變) ===
@@ -558,3 +567,22 @@ class DessertGrade(models.Model):
 
     def __str__(self):
         return f"{self.dessert.name} - {self.name} (NT${self.price})"
+
+
+class DessertImage(models.Model):
+    """甜點詳細頁的多張照片（跟葡萄的 ProductImage 一樣）"""
+    dessert = models.ForeignKey(
+        Dessert,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name="所屬甜點"
+    )
+    image = models.ImageField(upload_to='dessert_gallery/', verbose_name="甜點圖片")
+    order = models.PositiveIntegerField(default=0, verbose_name="排序")
+
+    class Meta:
+        verbose_name = "甜點更多圖片"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.dessert.name} 的圖片"

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade
+from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage
 
 #選擇品種回傳前端格式
 class VarietySerializer(serializers.ModelSerializer):
@@ -253,6 +253,9 @@ class CreateOrderSerializer(serializers.Serializer):
                 raise serializers.ValidationError("每個品項必須包含 product_id")
             if 'quantity' not in item or item['quantity'] < 1:
                 raise serializers.ValidationError("每個品項的數量必須 >= 1")
+            # 確保有 item_type
+            if 'item_type' not in item:
+                item['item_type'] = 'product' # 若無提供，預設為葡萄
         return value
 
     @transaction.atomic
@@ -271,30 +274,38 @@ class CreateOrderSerializer(serializers.Serializer):
         subtotal = 0
 
         for item_data in items_data:
-            product = Product.objects.select_for_update().get(id=item_data['product_id'])
+            item_type = item_data.get('item_type', 'product')
             quantity = item_data['quantity']
 
+            # 根據 item_type 去找對應的 Model
+            if item_type == 'dessert':
+                product_obj = Dessert.objects.select_for_update().get(id=item_data['product_id'])
+            else:
+                product_obj = Product.objects.select_for_update().get(id=item_data['product_id'])
+            
             # 取得等級（如果有）
             grade = None
             grade_name = ''
             if item_data.get('grade_id'):
-                grade = ProductGrade.objects.select_for_update().get(
-                    id=item_data['grade_id'], product=product
-                )
+                if item_type == 'dessert':
+                    grade = DessertGrade.objects.select_for_update().get(id=item_data['grade_id'], dessert=product_obj)
+                else:
+                    grade = ProductGrade.objects.select_for_update().get(id=item_data['grade_id'], product=product_obj)
+                
                 unit_price = grade.price
                 grade_name = grade.name
 
                 # 檢查等級庫存
                 if grade.stock < quantity:
                     raise serializers.ValidationError(
-                        f"「{product.name} - {grade.name}」庫存不足（剩餘 {grade.stock} 件）"
+                        f"「{product_obj.name} - {grade.name}」庫存不足（剩餘 {grade.stock} 件）"
                     )
             else:
-                unit_price = product.price
+                unit_price = product_obj.price
                 # 檢查商品庫存
-                if product.stock < quantity:
+                if product_obj.stock < quantity:
                     raise serializers.ValidationError(
-                        f"「{product.name}」庫存不足（剩餘 {product.stock} 件）"
+                        f"「{product_obj.name}」庫存不足（剩餘 {product_obj.stock} 件）"
                     )
 
             # 品種名稱快照
@@ -307,9 +318,11 @@ class CreateOrderSerializer(serializers.Serializer):
             subtotal += item_total
 
             order_items_to_create.append({
-                'product': product,
+                'item_type': item_type,
+                'product': product_obj if item_type == 'product' else None,
+                'dessert': product_obj if item_type == 'dessert' else None,
                 'grade': grade,
-                'product_name': product.name,
+                'product_name': product_obj.name,
                 'grade_name': grade_name,
                 'variety_names': variety_names,
                 'product_image': product_image,
@@ -399,7 +412,9 @@ class CreateOrderSerializer(serializers.Serializer):
         for item_info in order_items_to_create:
             OrderItem.objects.create(
                 order=order,
+                item_type=item_info['item_type'],
                 product=item_info['product'],
+                dessert=item_info['dessert'],
                 product_name=item_info['product_name'],
                 grade_name=item_info['grade_name'],
                 variety_names=item_info['variety_names'],
@@ -414,8 +429,10 @@ class CreateOrderSerializer(serializers.Serializer):
                 item_info['grade'].stock -= item_info['quantity']
                 item_info['grade'].save()
             else:
-                item_info['product'].stock -= item_info['quantity']
-                item_info['product'].save()
+                target_model = item_info['dessert'] if item_info['item_type'] == 'dessert' else item_info['product']
+                if target_model:
+                    target_model.stock -= item_info['quantity']
+                    target_model.save()
 
         return order
 
@@ -443,14 +460,20 @@ class DessertGradeSerializer(serializers.ModelSerializer):
         model = DessertGrade
         fields = ['id', 'name', 'count', 'price', 'stock']
 
+class DessertImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DessertImage
+        fields = ['id', 'image', 'order']
+
 class DessertSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     category_name = serializers.CharField(source='category.name', read_only=True)
     grades = DessertGradeSerializer(many=True, read_only=True)
+    images = DessertImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Dessert
-        fields = ['id', 'category', 'category_name', 'name', 'flavor', 'price', 'image', 'description', 'stock', 'is_active', 'grades']
+        fields = ['id', 'category', 'category_name', 'name', 'flavor', 'price', 'image', 'images', 'description', 'stock', 'is_active', 'grades']
 
     def get_image(self, obj):
         request = self.context.get('request')

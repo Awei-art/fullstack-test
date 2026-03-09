@@ -60,6 +60,19 @@ const flavorColorMap = {
 }
 const getFlavorColor = (flavor) => flavorColorMap[flavor] || '#dcb15c'
 
+// 取得顯示價格（有規格就取最低價，沒有就用原價）
+const getDisplayPrice = (dessert) => {
+    if (dessert.grades && dessert.grades.length > 0) {
+        return Math.min(...dessert.grades.map(g => g.price))
+    }
+    return dessert.price
+}
+
+// 是否有多規格（用來決定要不要加「起」字）
+const hasMultipleGrades = (dessert) => {
+    return dessert.grades && dessert.grades.length > 1
+}
+
 // ====== 購物車相關邏輯 ======
 import { useCartStore } from '@/stores/cart'
 const cartStore = useCartStore()
@@ -95,7 +108,8 @@ const addToCart = (dessert) => {
     }
 
     const cartItem = {
-        id: `dessert-${dessert.id}`,
+        itemType: 'dessert',
+        id: dessert.id,
         productId: dessert.id,
         name: dessert.name,
         image: safeImage,
@@ -174,7 +188,7 @@ const addToCart = (dessert) => {
                         <div class="dessert_card_body">
                             <div class="dessert_card_header">
                                 <h3 class="dessert_card_name">{{ d.name }}</h3>
-                                <span class="dessert_card_price"><small>NT$</small> {{ d.price }}</span>
+                                <span class="dessert_card_price"><small>NT$</small> {{ getDisplayPrice(d) }}<small v-if="hasMultipleGrades(d)" class="price_suffix"> 起</small></span>
                             </div>
                             
                             <div class="dessert_card_footer">

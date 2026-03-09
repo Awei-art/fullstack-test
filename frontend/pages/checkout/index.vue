@@ -487,7 +487,8 @@ async function submitOrder() {
 
     // 組裝訂單品項
     const items = cartItems.value.map(item => ({
-      product_id: item.id,
+      item_type: item.itemType || 'product', // 傳送商品類型，讓後端區分葡萄或大福
+      product_id: typeof item.id === 'string' ? parseInt(item.id.replace(/^(dessert-|product-)/, '')) : item.id,
       grade_id: item.gradeId || null,
       quantity: item.quantity,
       variety_names: item.varieties

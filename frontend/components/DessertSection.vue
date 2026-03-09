@@ -1,34 +1,51 @@
 <script setup>
+import { ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
-const desserts = [
-    {
-        img: '/images/dessert01.png',
-        sub: '每月收到它的喜悅',
-        title: '蔬菜採集課程',
-        link: '#'
-    },
-    {
-        img: '/images/dessert02.png',
-        sub: '說到北海道的秋季風味！',
-        title: '目前供應各種馬鈴薯',
-        link: '#'
-    },
-    {
-        img: '/images/dessert03.png',
-        sub: '米送到家門口',
-        title: '北海道米訂閱原因',
-        link: '#'
+
+const config = useRuntimeConfig()
+const getApiBase = () => process.server ? config.public.apiBase : config.public.apiBaseClient
+
+// 取得真實甜點資料
+const { data: rawDesserts, pending } = await useFetch('/desserts/', {
+    baseURL: getApiBase(),
+    key: 'home-dessert-list',
+    default: () => []
+})
+
+// 圖片路徑處理
+const getImageUrl = (url) => {
+    if (!url) return null
+    const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
+    if (url.startsWith('http://backend:8000')) {
+        return url.replace('http://backend:8000', clientBaseUrl)
     }
-]
+    if (url.startsWith('/media/')) {
+        return `${clientBaseUrl}${url}`
+    }
+    return url
+}
+
+// 取得顯示價格（有規格就取最低價，沒有就用原價）
+const getDisplayPrice = (dessert) => {
+    if (dessert.grades && dessert.grades.length > 0) {
+        return Math.min(...dessert.grades.map(g => g.price))
+    }
+    return dessert.price
+}
+
+// 是否有多規格（用來決定要不要加「起」字）
+const hasMultipleGrades = (dessert) => {
+    return dessert.grades && dessert.grades.length > 1
+}
 
 const modules = [Navigation]
 </script>
 
 <template>
-    <section class="dessert_section">
+    <section class="dessert_section" v-show="!pending && rawDesserts && rawDesserts.length > 0">
         <div class="dessert_container">
             <ClientOnly>
                 <div class="dessert_carousel_wrap">
@@ -37,7 +54,7 @@ const modules = [Navigation]
                     <Swiper
                         class="dessert_carousel"
                         :modules="modules"
-                        :loop="desserts.length > 3" 
+                        :loop="rawDesserts.length > 3" 
                         :navigation="{
                             prevEl: '.dessert_prev',
                             nextEl: '.dessert_next'
@@ -48,15 +65,22 @@ const modules = [Navigation]
                             1000: { slidesPerView: 3, spaceBetween: 30 }
                         }"
                     >
-                        <SwiperSlide v-for="(item, index) in desserts" :key="index">
+                        <SwiperSlide v-for="item in rawDesserts" :key="item.id">
                             <div class="dessert_card">
                                 <div class="dessert_img_wrap">
-                                    <img :src="item.img" :alt="item.title" class="dessert_img">
+                                    <NuxtLink :to="`/desserts/${item.id}`" style="display:block; width:100%; height:100%;">
+                                        <img :src="getImageUrl(item.image) || '/images/default-grape.png'" :alt="item.name" class="dessert_img">
+                                    </NuxtLink>
                                 </div>
                                 <div class="dessert_info">
-                                    <p class="dessert_sub">{{ item.sub }}</p>
-                                    <h3 class="dessert_title">{{ item.title }}</h3>
-                                    <NuxtLink :to="item.link" class="btn_dessert_more">了解更多</NuxtLink>
+                                    <h3 class="dessert_title">{{ item.name }}</h3>
+                                    
+                                    <!-- 價格顯示 -->
+                                    <div class="dessert_price_wrap" style="color: #e8627c; font-weight: bold; margin-bottom: 20px; font-size: 1.1rem;">
+                                        <small>NT$</small> {{ getDisplayPrice(item) }}<small v-if="hasMultipleGrades(item)" style="font-size: 0.85rem; font-weight: normal; color: #b0707e;"> 起</small>
+                                    </div>
+
+                                    <NuxtLink :to="`/desserts/${item.id}`" class="btn_dessert_more">了解更多</NuxtLink>
                                 </div>
                             </div>
                         </SwiperSlide>

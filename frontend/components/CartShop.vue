@@ -9,7 +9,14 @@ const baseURL = process.server ? config.public.apiBase : config.public.apiBaseCl
 
 // 呼叫後端 API 取得最新商品與庫存資料
 const { data: products } = await useFetch('/products/', {
-  baseURL: baseURL
+  baseURL: baseURL,
+  key: 'cart-products',
+  default: () => []
+})
+const { data: desserts } = await useFetch('/desserts/', {
+  baseURL: baseURL,
+  key: 'cart-desserts',
+  default: () => []
 })
 
 // 2. 初始化 store
@@ -20,7 +27,7 @@ const rawCartItems = computed(() => cartStore.items)
 
 // 結合即時的產品資料，確認購物車內商品使否有效（有庫存且品種未關閉）
 const cartItems = computed(() => {
-  if (!products.value) {
+  if (!products.value || !desserts.value || (products.value.length === 0 && desserts.value.length === 0)) {
     return rawCartItems.value.map(item => ({ ...item, isValid: true, statusText: '' }))
   }
 
@@ -29,14 +36,34 @@ const cartItems = computed(() => {
     let statusText = ''
     let latestMaxStock = item.maxStock
 
-    const latestProduct = products.value.find(p => p.id === item.id)
+    let latestProduct = null
+    
+    // 支援舊版 localStorage 裡存的字串 ID (例如 "dessert-1")
+    let realId = item.id
+    let safeItemType = item.itemType || 'product'
+    
+    if (typeof realId === 'string') {
+      if (realId.startsWith('dessert-')) safeItemType = 'dessert'
+      realId = parseInt(realId.replace(/^(dessert-|product-)/, ''))
+    }
+
+    // 將修復後的型別塞回去，以免後續出錯
+    item.itemType = safeItemType
+
+    if (safeItemType === 'dessert') {
+      latestProduct = desserts.value?.find(d => d.id === realId)
+    } else {
+      latestProduct = products.value?.find(p => p.id === realId)
+    }
+
     if (!latestProduct) {
       isValid = false
       statusText = '已下架'
     } else {
       // 檢查等級庫存或總庫存
       if (item.gradeId) {
-        const grade = latestProduct.grades?.find(g => g.id === item.gradeId)
+        const safeGradeId = typeof item.gradeId === 'string' ? parseInt(item.gradeId) : item.gradeId
+        const grade = latestProduct.grades?.find(g => g.id === safeGradeId)
         if (grade) {
           latestMaxStock = grade.stock
           if (grade.stock <= 0) isValid = false
@@ -49,8 +76,8 @@ const cartItems = computed(() => {
         if (latestProduct.stock <= 0) isValid = false
       }
 
-      // 檢查品種是否全都有開放
-      if (isValid && item.varieties && item.varieties.length > 0) {
+      // 檢查品種是否全都有開放 (葡萄專用)
+      if (safeItemType !== 'dessert' && isValid && item.varieties && item.varieties.length > 0) {
         const activeVarietyIds = latestProduct.varieties ? latestProduct.varieties.map(v => v.id) : []
         const hasClosedVariety = item.varieties.some(v => !activeVarietyIds.includes(v.id))
         

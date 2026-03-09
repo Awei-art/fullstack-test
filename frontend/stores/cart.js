@@ -57,7 +57,8 @@ export const useCartStore = defineStore('cart', {
         ? product.varieties.map(v => v.id).sort().join('-')
         : 'no-variety'
 
-      const uniqueKey = `${product.id}-${product.gradeId || 'no-grade'}-${varietiesStr}`
+      const itemType = product.itemType || 'product'
+      const uniqueKey = `${itemType}-${product.id}-${product.gradeId || 'no-grade'}-${varietiesStr}`
       // 2. 檢查購物車裡面是不是已經有這個東西了？
       const existingItem = this.items.find(item => item.key === uniqueKey)
 
@@ -74,6 +75,7 @@ export const useCartStore = defineStore('cart', {
         // B. 如果沒有，就推入一個新的物件，並加上 key
         this.items.push({
           key: uniqueKey, // 用來識別的鑰匙
+          itemType: itemType, // 明確標記商品類型
           ...product      // 把商品的所有資訊 (圖片、名稱、價格...) 都存進去
         })
       }

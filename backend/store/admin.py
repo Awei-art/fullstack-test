@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage
 # Register your models here.
 
 #定義品種頁 顯示有貨
@@ -129,6 +129,11 @@ class DessertGradeInline(admin.TabularInline):
     model = DessertGrade
     extra = 1
 
+class DessertImageInline(admin.TabularInline):
+    model = DessertImage
+    extra = 1
+    fields = ['image', 'order']
+
 @admin.register(Dessert)
 class DessertAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'flavor', 'price', 'stock', 'is_active', 'sort_order')
@@ -136,4 +141,4 @@ class DessertAdmin(admin.ModelAdmin):
     list_editable = ('price', 'stock', 'is_active', 'sort_order')
     list_display_links = ('name',)
     search_fields = ('name', 'flavor')
-    inlines = [DessertGradeInline]
+    inlines = [DessertImageInline, DessertGradeInline]

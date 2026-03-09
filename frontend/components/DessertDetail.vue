@@ -22,17 +22,30 @@ const { data: dessert, pending } = await useFetch(`/desserts/${route.params.id}/
 const galleryImages = computed(() => {
   if (!dessert.value) return []
   const list = []
+  const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
+
+  // 修正圖片 URL 的通用函式
+  const fixUrl = (url) => {
+    if (url.startsWith('http://backend:8000')) {
+      return url.replace('http://backend:8000', clientBaseUrl)
+    } else if (url.startsWith('/media/')) {
+      return `${clientBaseUrl}${url}`
+    }
+    return url
+  }
   
+  // 1. 主圖優先
   if (dessert.value.image) {
-    let img = dessert.value.image
-    const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
-    if (img.startsWith('http://backend:8000')) {
-        img = img.replace('http://backend:8000', clientBaseUrl)
-    }
-    else if (img.startsWith('/media/')) {
-        img = `${clientBaseUrl}${img}`
-    }
-    list.push(img)
+    list.push(fixUrl(dessert.value.image))
+  }
+
+  // 2. 後台上傳的多張額外圖片
+  if (dessert.value.images && dessert.value.images.length > 0) {
+    dessert.value.images.forEach(img => {
+      if (img.image) {
+        list.push(fixUrl(img.image))
+      }
+    })
   }
   
   if (list.length === 0) list.push('/images/default-grape.png')
@@ -146,7 +159,8 @@ const addToCart = (skipOpen = false) => {
   if (isSoldOut.value || displayStock.value === 0) return
 
   const cartItem = {
-    id: `dessert-${dessert.value.id}`,
+    itemType: 'dessert',
+    id: dessert.value.id,
     productId: dessert.value.id,
     name: dessert.value.name,
     image: galleryImages.value[0], 
@@ -243,7 +257,7 @@ const breadcrumbs = computed(() => {
         <div class="option_group">
           <span class="option_label">運送方式</span>
           <button class="selected_shipping">
-            黑貓冷藏宅配 (運費另計)
+            黑貓冷凍宅配 (運費另計)
           </button>
           <a href="#" class="shipping_detail_link">運費詳情</a>
         </div>

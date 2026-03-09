@@ -268,6 +268,7 @@ const addToCart = (skipOpen = false) => {
   }
   // 1. 整理要存進購物車的資料
   const cartItem = {
+    itemType: 'product',
     id: product.value.id,
     name: product.value.name,
     image: safeImage, // 存圖片路徑，購物車頁面要顯示

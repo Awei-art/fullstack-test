@@ -120,6 +120,7 @@ const addToCart = (product) => {
 
   // 整理要存進購物車的資料
   const cartItem = {
+    itemType: 'product',
     id: product.id,
     name: product.name,
     image: safeImage,
