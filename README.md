@@ -7,7 +7,7 @@
 ```
 my-fullstack-project/
 ├── backend/          # Django 後端 API
-├── fountend/         # Nuxt 3 前端
+├── frontend/         # Nuxt 3 前端
 ├── docker-compose.yml
 ├── .env              # 環境變數（不上傳）
 ├── .env.example      # 環境變數範例
@@ -22,6 +22,7 @@ my-fullstack-project/
 | **後端** | Django 6.0 + Django REST Framework |
 | **資料庫** | MySQL 8.0 |
 | **認證** | JWT (Simple JWT) |
+| **金流** | 綠界科技 ECPay |
 | **部署** | Docker + Docker Compose |
 | **靜態檔案** | WhiteNoise |
 | **資料庫管理** | phpMyAdmin |
