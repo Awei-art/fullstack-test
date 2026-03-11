@@ -2,44 +2,6 @@
    品種介紹頁 Styles
    ============================== */
 
-/* ---------- Hero ---------- */
-.variety_hero {
-    position: relative;
-    height: 420px;
-    background: url('https://images.unsplash.com/photo-1596451190630-186aff535bf2?w=1600&h=600&fit=crop') center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.variety_hero_overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(93, 64, 55, 0.55), rgba(74, 20, 140, 0.35));
-}
-
-.variety_hero_content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    color: #fff;
-}
-
-.variety_hero_title {
-    font-size: 42px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    margin-bottom: 14px;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-}
-
-.variety_hero_subtitle {
-    font-size: 17px;
-    letter-spacing: 0.08em;
-    opacity: 0.9;
-    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-}
 
 /* ---------- 切換按鈕 ---------- */
 .variety_view_switcher {
@@ -333,17 +295,6 @@
    ============================ */
 
 @media (max-width: 900px) {
-    .variety_hero {
-        height: 280px;
-    }
-
-    .variety_hero_title {
-        font-size: 28px;
-    }
-
-    .variety_hero_subtitle {
-        font-size: 14px;
-    }
 
     .variety_grid {
         grid-template-columns: 1fr;

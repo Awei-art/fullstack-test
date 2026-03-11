@@ -6,13 +6,8 @@ definePageMeta({ layout: 'default' })
     <div class="about_page">
 
         <!-- ============ Hero 橫幅 ============ -->
-        <section class="about_hero">
-            <div class="about_hero_overlay"></div>
-            <div class="about_hero_content">
-                <h1 class="about_hero_title">關於田原</h1>
-                <p class="about_hero_subtitle">用心栽培每一串葡萄，傳遞土地的溫度</p>
-            </div>
-        </section>
+        <HeroBanner title="關於田原" subtitle="用心栽培每一串葡萄，傳遞土地的溫度" />
+
 
         <!-- ============ 品牌故事 ============ -->
         <section class="about_section about_story">

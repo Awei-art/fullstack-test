@@ -56,13 +56,10 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <section class="news_page">
-        <div class="news_page_container">
-            <!-- 頁面標題 -->
-            <div class="news_page_header">
-                <h2 class="news_page_title">最新消息</h2>
-                <p class="news_page_subtitle">田原溫室的最新動態與公告資訊</p>
-            </div>
+    <div>
+        <HeroBanner title="最新消息" subtitle="田原溫室的最新動態與公告資訊" />
+        <section class="news_page">
+            <div class="news_page_container">
 
             <!-- 分類 Tab -->
             <div class="news_category_tabs">
@@ -135,8 +132,9 @@ const formatDate = (dateStr) => {
                 <i class="fas fa-newspaper"></i>
                 <p>目前暫無最新消息</p>
             </div>
-        </div>
-    </section>
+            </div>
+        </section>
+    </div>
 </template>
 
 <style src="@/assets/css/NewsPage.css" scoped></style>

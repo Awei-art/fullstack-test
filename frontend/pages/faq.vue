@@ -36,14 +36,8 @@ useHead({
 <template>
   <div>
 
-    <!-- Hero 橫幅 -->
-    <section class="faq_hero">
-        <div class="faq_hero_overlay"></div>
-        <div class="faq_hero_content">
-            <h1 class="faq_hero_title">常見問題 FAQ</h1>
-            <p class="faq_hero_subtitle">您的疑問，我們用心解答</p>
-        </div>
-    </section>
+    <!-- 使用統一的 Hero 橫幅元件 -->
+    <HeroBanner title="常見問題 FAQ" subtitle="您的疑問，我們用心解答" />
 
     <FaqSection />
 
@@ -52,55 +46,7 @@ useHead({
 
 
 <style scoped>
-.faq_hero {
-    position: relative;
-    height: 420px;
-    background: url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=1600&h=600&fit=crop') center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.faq_hero_overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(93, 64, 55, 0.55), rgba(74, 20, 140, 0.35));
-}
-
-.faq_hero_content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    color: #fff;
-}
-
-.faq_hero_title {
-    font-size: 42px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    margin-bottom: 14px;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-}
-
-.faq_hero_subtitle {
-    font-size: 17px;
-    letter-spacing: 0.08em;
-    opacity: 0.9;
-    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-}
-
-@media (max-width: 900px) {
-    .faq_hero {
-        height: 280px;
-    }
-    .faq_hero_title {
-        font-size: 28px;
-    }
-    .faq_hero_subtitle {
-        font-size: 14px;
-    }
-}
+/* faq 專屬樣式（如果有的話，目前只剩下 FaqSection 所以可以不用了） */
 </style>
 
 

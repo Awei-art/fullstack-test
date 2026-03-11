@@ -63,13 +63,7 @@ const viewMode = ref('grid') // 'grid' | 'detail'
     <div class="variety_page">
 
         <!-- Hero 橫幅 -->
-        <section class="variety_hero">
-            <div class="variety_hero_overlay"></div>
-            <div class="variety_hero_content">
-                <h1 class="variety_hero_title">品種介紹</h1>
-                <p class="variety_hero_subtitle">每一顆葡萄，都有獨特的風味故事</p>
-            </div>
-        </section>
+        <HeroBanner title="品種介紹" subtitle="每一顆葡萄，都有獨特的風味故事" />
 
         <!-- 切換模式按鈕 -->
         <div class="variety_view_switcher">

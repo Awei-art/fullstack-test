@@ -15,25 +15,7 @@
     padding: 0 30px;
 }
 
-/* 頁面標題 */
-.news_page_header {
-    text-align: center;
-    margin-bottom: 50px;
-}
 
-.news_page_title {
-    font-size: 32px;
-    color: #5d4037;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    margin-bottom: 12px;
-}
-
-.news_page_subtitle {
-    font-size: 15px;
-    color: #8d6e63;
-    letter-spacing: 0.05em;
-}
 
 /* 分類 Tab */
 .news_category_tabs {
@@ -280,10 +262,6 @@
 @media (max-width: 900px) {
     .news_page {
         padding: 60px 0 40px;
-    }
-
-    .news_page_title {
-        font-size: 24px;
     }
 
     .news_category_tabs {

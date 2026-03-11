@@ -2,42 +2,7 @@
    關於田原 – Page Styles
    ============================== */
 
-/* ---------- Hero 橫幅 ---------- */
-.about_hero {
-    position: relative;
-    height: 420px;
-    background: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1600&h=600&fit=crop') center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.about_hero_overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(93, 64, 55, 0.55), rgba(74, 20, 140, 0.35));
-}
-
-.about_hero_content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    color: #fff;
-}
-
-.about_hero_title {
-    font-size: 42px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    margin-bottom: 14px;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-}
-
-.about_hero_subtitle {
-    font-size: 17px;
-    letter-spacing: 0.08em;
-    opacity: 0.9;
-}
 
 /* ---------- 通用區塊 ---------- */
 .about_section {
@@ -279,17 +244,7 @@
    ============================ */
 
 @media (max-width: 900px) {
-    .about_hero {
-        height: 280px;
-    }
 
-    .about_hero_title {
-        font-size: 28px;
-    }
-
-    .about_hero_subtitle {
-        font-size: 14px;
-    }
 
     .about_section {
         padding: 60px 0;
