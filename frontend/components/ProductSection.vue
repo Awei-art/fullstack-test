@@ -42,6 +42,15 @@ const formatPrice = (price) => {
 
 // 5. 處理圖片路徑 (解決 SSR 與上線部署後的路徑問題)
 const getImageUrl = (url) => {
+    if (!url) return null;
+    
+    // Cloudinary 優化：自動壓縮與轉成 WebP
+    if (typeof url === 'string' && url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
+        if (!url.includes('f_auto') && !url.includes('q_auto')) {
+            url = url.replace('/image/upload/', '/image/upload/f_auto,q_auto/');
+        }
+    }
+
     if (!url) return '/images/default.png'
     
     // 找出目前前端對外呼叫後端的「根網址」(例如: https://api.yourdomain.com 或 http://127.0.0.1:8000)

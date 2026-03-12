@@ -33,6 +33,15 @@ const setCategory = (catId) => {
 
 // 圖片路徑處理
 const getImageUrl = (url) => {
+    if (!url) return null;
+    
+    // Cloudinary 優化：自動壓縮與轉成 WebP
+    if (typeof url === 'string' && url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
+        if (!url.includes('f_auto') && !url.includes('q_auto')) {
+            url = url.replace('/image/upload/', '/image/upload/f_auto,q_auto/');
+        }
+    }
+
     if (!url) return null
     const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
     if (url.startsWith('http://backend:8000')) {
