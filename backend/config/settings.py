@@ -142,6 +142,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 _cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _cors_origins.split(',')]
 
+# CSRF 設定 (允許從哪些網域送入敏感操作表單，像是登入 Admin)
+_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://tianyuan-grape-api.zeabur.app')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',')]
+
 # REST Framework 設定
 #預設使用 JWT 認證之後在 View 中可以用 request.user 取得登入的使用者
 REST_FRAMEWORK = {
