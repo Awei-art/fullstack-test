@@ -27,8 +27,8 @@ COPY . .
 # 收集靜態檔案
 RUN python manage.py collectstatic --noinput || true
 
-# 開放 8000 port
-EXPOSE 8000
+# 開放 8080 port
+EXPOSE 8080
 
 # 啟動 Gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8080", "--workers", "3"]
