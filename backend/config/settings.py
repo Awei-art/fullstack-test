@@ -134,20 +134,35 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # 媒體檔案設定
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Cloudinary 雲端圖庫設定
 if os.environ.get('CLOUD_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Cloudinary 雲端圖庫設定 (Django 5/6 版本寫法)
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
         'API_KEY': os.environ.get('API_KEY'),
         'API_SECRET': os.environ.get('API_SECRET'),
         'SECURE': True,
+    }
+else:
+    # 預設本地端設定
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
     }
 
 # CORS 設定（允許前端連線）
