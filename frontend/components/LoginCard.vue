@@ -1,8 +1,21 @@
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, computed, onMounted } from 'vue';
 
 // 取得 Nuxt 設定（API 網址）
 const config = useRuntimeConfig();
+
+// LINE / Google 快速登入（動態偵測目前網址，不再寫死 localhost）
+const lineLoginUrl = computed(() => {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+  const redirectUri = encodeURIComponent(`${origin}/login/line-callback`);
+  return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=${redirectUri}&state=login_state_123&scope=profile%20openid`;
+});
+
+const googleLoginUrl = computed(() => {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+  const redirectUri = encodeURIComponent(`${origin}/login/google-callback`);
+  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=***REMOVED_GOOGLE_CLIENT_ID***&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&access_type=online`;
+});
 
 // 路由控制 (返回首頁)
 const router = useRouter();
@@ -190,13 +203,13 @@ const handleLogin = async () => {
       </div>
 
       <!-- 🔥 新增：LINE 登入按鈕 -->
-      <a :href="`https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=http://localhost:3000/login/line-callback&state=login_state_123&scope=profile%20openid`" class="line-login-btn">
+      <a :href="lineLoginUrl" class="line-login-btn">
         <i class="fab fa-line line-icon"></i>
         <span>使用 LINE 快速登入</span>
       </a>
 
       <!-- 🔥 新增：Google 登入按鈕 -->
-      <a :href="`https://accounts.google.com/o/oauth2/v2/auth?client_id=***REMOVED_GOOGLE_CLIENT_ID***&redirect_uri=http://localhost:3000/login/google-callback&response_type=code&scope=email%20profile&access_type=online`" class="google-login-btn">
+      <a :href="googleLoginUrl" class="google-login-btn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" class="google-icon">
           <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
           <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
