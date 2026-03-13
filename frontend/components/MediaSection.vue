@@ -5,12 +5,6 @@ import 'swiper/css';
 
 const mediaList = [
     {
-        type: 'video',
-        url: 'https://www.youtube.com/embed/TOtOgUNrIO8?rel=0',
-        img: '/images/S__41623562_0.jpg',
-        alt: '葡萄園影片'
-    },
-    {
         type: 'image',
         url: null,
         img: '/images/grape01.png',
