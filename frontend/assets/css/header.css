@@ -312,16 +312,16 @@ nav {
 }
 
 .hamburger-lines {
-    width: 30px;
+    width: 22px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .hamburger-lines .line {
     display: block;
     width: 100%;
-    height: 3px;
+    height: 2.5px;
     background: var(--grape-primary);
     border-radius: 3px;
     transition: all 0.3s;
@@ -337,61 +337,75 @@ nav {
 /* Responsive */
 @media (max-width: 900px) {
 
-    /* Header Layout Reordering */
+    /* Header Layout - 手機版 */
     .header {
         position: relative;
         justify-content: center;
-        /* Center logo by default, needed for absolute logic to make sense visually */
         padding: 0 10px;
     }
 
-    /* 1. Hamburger Menu - Absolute Left */
+    /* 1. Hamburger Menu - 預設隱藏在右側，捲動後從右邊滑入到左邊 */
     .btn_all_menu {
         display: block;
         position: absolute;
-        left: 5px;
         top: 50%;
-        transform: translateY(-50%);
-        order: 1;
         z-index: 1001;
+        opacity: 0;
+        pointer-events: none;
+        /* 起始位置：左邊螢幕外 */
+        left: -40px;
+        transform: translateY(-50%);
+        transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* 2. Logo - Center */
+    /* 捲動後漢堡圖：從右邊滑到左邊 + 淡入 */
+    .header.scrolled .btn_all_menu {
+        opacity: 1;
+        pointer-events: auto;
+        left: 5px;
+    }
+
+    /* 2. Logo - 用 transform 做真正有滑動感的位移 */
     .logo {
         margin: 0;
         z-index: 900;
         position: relative;
-        /* Center is handled by flex justify-content center on parent */
+        /* 用 vw 單位計算偏移，不管螢幕多寬都能貼到左邊 */
+        /* -50vw: 從中央推到左牆, +50%: 補回自身一半寬度, +15px: 左邊留白 */
+        transform: translateX(calc(-50vw + 50% + 15px));
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    /* Increase Logo Size on Mobile */
+    /* 捲動後 Logo 滑回正中央 */
+    .header.scrolled .logo {
+        transform: translateX(0);
+    }
+
+    /* Logo Size on Mobile */
     .logo a {
-        height: 35px;
-        /* Increased from default 35px */
+        height: 28px;
     }
 
-    /* 3. Login Button (Util Wrap) - Absolute Right */
+    /* 3. Util Wrap — 購物車 + 登入/頭像 */
     .util_wrap {
         display: flex;
         position: absolute;
         right: 0px;
-        /* Align strictly to right edge */
         top: 50%;
         transform: translateY(-50%);
         margin: 0;
         width: auto;
         padding: 0;
-        gap: 0px;
-        /* Remove gap */
+        gap: 5px;
         z-index: 900;
     }
 
+    /* 購物車 — 正常排版，不用 absolute */
     .btn_cart {
         padding: 5px;
         width: 40px;
         height: 40px;
-        margin-right: -3px;
-        /* Pull cart closer to login/right edge overlap */
     }
 
     .btn_cart svg {
@@ -399,14 +413,40 @@ nav {
         height: 24px;
     }
 
+    /* 登入按鈕/頭像 — 捲動後用 max-width 縮小，讓購物車自然滑到右邊 */
+    .btn_login,
+    .header-user-wrapper,
+    .header-logout-btn {
+        max-width: 50px;
+        transition: max-width 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    padding 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    margin 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        white-space: nowrap;
+    }
+
+    /* btn_login 和 logout 可以 overflow:hidden，但 user-wrapper 不行（要顯示下拉選單） */
+    .btn_login,
+    .header-logout-btn {
+        overflow: hidden;
+    }
+
+    .header.scrolled .btn_login,
+    .header.scrolled .header-user-wrapper,
+    .header.scrolled .header-logout-btn {
+        max-width: 0;
+        opacity: 0;
+        pointer-events: none;
+        padding: 0;
+        margin: 0;
+    }
+
     /* Transform Login Button to Icon */
     .btn_login {
         padding: 5px;
         border: none;
         box-shadow: none;
-        /* Remove glow on mobile */
         border-radius: 50%;
-        /* Circle */
         width: 40px;
         height: 40px;
         min-width: unset;
@@ -418,19 +458,15 @@ nav {
 
     .btn_login:hover {
         box-shadow: none;
-        /* No glow on hover on mobile */
         background: rgba(111, 45, 168, 0.05);
-        /* Subtle bg on touch */
     }
 
     .btn_login .btn_text {
         display: none;
-        /* Hide text */
     }
 
     .btn_login .icon_user {
         display: block;
-        /* Show Icon */
         stroke: var(--grape-primary);
     }
 
@@ -530,9 +566,17 @@ nav {
     .header_menu_wrap .menu_link {
         display: block;
         padding: 15px 30px;
-        /* Add horizontal padding (30px left/right) */
         width: 100%;
         position: relative;
+    }
+
+    /* 手機版取消 hover 底線動畫 */
+    .header_menu_wrap .menu_link::after {
+        display: none;
+    }
+
+    .header_menu_wrap .menu_link:hover {
+        color: var(--grape-primary);
     }
 
     /* Submenu Arrow Indicator */
@@ -622,22 +666,16 @@ nav {
         box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Backdrop Overlay */
-    .header.mobile-menu-open::after {
-        content: '';
+    /* Backdrop Overlay - 使用真實 div 取代 ::after，讓點擊可以關閉選單 */
+    .mobile-overlay {
         position: fixed;
-        /* Use 100vh/100vw to force full screen coverage even if container is smaller */
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
         background: rgba(0, 0, 0, 0.5);
-        /* Black 50% opacity */
         z-index: 999;
-        /* Below menu (1000) but above everything else (900) */
         animation: fadeIn 0.3s ease forwards;
-        pointer-events: auto;
-        /* Block clicks */
     }
 }
 

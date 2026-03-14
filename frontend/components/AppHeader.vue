@@ -25,6 +25,18 @@ const openMiniCart = (e) => {
 const isMenuOpen = ref(false)
 const headerRef = ref(null)
 
+// 🔥 捲動偵測：控制手機版漢堡圖 & Logo 位置動畫
+// 加入滯後 (hysteresis) 防止在臨界點反覆閃爍
+const isScrolled = ref(false)
+const handleScroll = () => {
+    const y = window.scrollY
+    if (!isScrolled.value && y > 80) {
+        isScrolled.value = true
+    } else if (isScrolled.value && y < 30) {
+        isScrolled.value = false
+    }
+}
+
 const isUserMenuOpen = ref(false)
 const userMenuRef = ref(null)
 
@@ -73,16 +85,19 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
     document.addEventListener('click', handleClickOutside)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
 })
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
+    window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
 <template>
     <header class="header_wrap grape-theme">
-        <div class="header" :class="{ 'mobile-menu-open': isMenuOpen }" ref="headerRef">
+        <div class="header" :class="{ 'mobile-menu-open': isMenuOpen, 'scrolled': isScrolled }" ref="headerRef">
             <h1 class="logo">
                 <NuxtLink to="/" class="logo_link">
                     <img src="/images/logo_icon.svg" alt="田原葡萄Icon" class="logo_icon">
@@ -98,12 +113,12 @@ onUnmounted(() => {
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="/news" class="menu_link">
+                        <NuxtLink to="/news" class="menu_link" @click="closeMenu">
                             <span>最新消息</span>
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="/about" class="menu_link">
+                        <NuxtLink to="/about" class="menu_link" @click="closeMenu">
                             <span>關於田原</span>
                         </NuxtLink>
                     </li>
@@ -125,12 +140,12 @@ onUnmounted(() => {
                         </ul>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="/varieties" class="menu_link">
+                        <NuxtLink to="/varieties" class="menu_link" @click="closeMenu">
                             <span>品種介紹</span>
                         </NuxtLink>
                     </li>
                     <li class="node1">
-                        <NuxtLink to="/faq" class="menu_link">
+                        <NuxtLink to="/faq" class="menu_link" @click="closeMenu">
                             <span>常見問題FAQ</span>
                         </NuxtLink>
                     </li>
@@ -198,6 +213,9 @@ onUnmounted(() => {
                     <span class="line"></span>
                 </div>
             </button>
+
+            <!-- 手機版遮罩：點擊黑色半透明背景可收起導覽列 -->
+            <div v-if="isMenuOpen" class="mobile-overlay" @click="closeMenu"></div>
         </div>
     </header>
     

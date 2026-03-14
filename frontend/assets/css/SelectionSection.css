@@ -237,6 +237,10 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+    .selection_section {
+        padding: 50px 0 60px;
+    }
+
     .selection_container {
         flex-direction: column;
         align-items: center;
@@ -250,11 +254,8 @@
 
     .selection_header {
         font-size: 24px;
-        /* 與「田原精選系列」手機版大小一致 */
         margin-bottom: 40px;
-        /* 在手機版大幅縮小與下方圖片的距離 */
-        margin-top: -80px;
-        /* 同步稍微降低上推的幅度避免卡太上去 */
+        margin-top: -20px;
     }
 
     .display_img {
