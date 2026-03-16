@@ -125,7 +125,6 @@ provide('activeColor', activeColor)
             :class="{ active: !activeColor }"
             @click="setColor(null)"
         >
-            <span class="color_grape all_grape"></span>
             <span>全部</span>
         </button>
         <button

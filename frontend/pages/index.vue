@@ -10,7 +10,6 @@ definePageMeta({
 <template>
   <div class="home-page">
     
-    <SaleBanner />
     <IntroSection />
     <Bulletin />
     <ProductSection />

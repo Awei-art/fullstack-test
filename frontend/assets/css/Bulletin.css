@@ -4,7 +4,6 @@
     margin-top: -150px;
     position: relative;
     z-index: 10;
-    /* Raise z-index to sit ON TOP of the intro section (z-index: 2) */
 }
 
 .custom_feature_section::before {
@@ -151,9 +150,9 @@
 .promo_stack {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    width: 450px;
-    /* Fixed width for promo buttons */
+    gap: clamp(15px, 2vw, 30px);
+    width: clamp(280px, 35vw, 450px);
+    /* 讓按鈕區塊隨視窗大小縮放 */
     flex-shrink: 0;
     align-items: center;
 }
@@ -161,7 +160,7 @@
 .promo_btn {
     display: block;
     width: 100%;
-    border-radius: 30px;
+    border-radius: clamp(15px, 3vw, 30px);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     box-shadow: 0 10px 25px rgba(106, 27, 154, 0.15);
@@ -208,11 +207,27 @@
         max-width: 500px;
     }
 
+    .custom_feature_section {
+        padding: 100px 0 60px;
+        margin-top: -80px;
+    }
+
     .news_container {
         left: 0;
-        /* 在手機平板版面取消向左偏移，使其置中 */
         margin-top: 20px;
-        /* 縮小在手機上的上方間距 */
+        padding: 20px;
+    }
+
+    .news_header h3 {
+        font-size: 1.3rem;
+    }
+
+    .en_title {
+        font-size: 0.85rem;
+    }
+
+    .news_item_header {
+        padding: 12px 8px;
     }
 
     .promo_stack {
@@ -223,16 +238,39 @@
 }
 
 @media (max-width: 600px) {
-    .news_item_content p {
-        padding: 15px;
+    .custom_feature_section {
+        padding: 70px 0 40px;
+        margin-top: -50px;
     }
 
-    .news_date {
-        margin-right: 10px;
+    .news_container {
+        padding: 16px;
+    }
+
+    .news_header h3 {
+        font-size: 1.1rem;
+    }
+
+    .en_title {
+        font-size: 0.75rem;
+    }
+
+    .news_item_header {
+        padding: 10px 6px;
+    }
+
+    .news_item_content p {
+        padding: 12px;
         font-size: 0.85rem;
     }
 
+    .news_date {
+        margin-right: 8px;
+        font-size: 0.75rem;
+        min-width: 75px;
+    }
+
     .news_title {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
     }
 }

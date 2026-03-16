@@ -48,9 +48,6 @@ const faqCategories = reactive([
     }
 ])
 
-const toggleFaq = (categoryIndex, itemIndex) => {
-    faqCategories[categoryIndex].list[itemIndex].isOpen = !faqCategories[categoryIndex].list[itemIndex].isOpen
-}
 </script>
 
 <template>
@@ -77,10 +74,10 @@ const toggleFaq = (categoryIndex, itemIndex) => {
                         class="faq_item"
                         :class="{ active: item.isOpen }"
                     >
-                        <button class="faq_question" @click="toggleFaq(catIndex, itemIndex)">
+                        <button class="faq_question" style="cursor: default;">
                             {{ item.question }}
                         </button>
-                        <div class="faq_answer" v-show="item.isOpen">
+                        <div class="faq_answer">
                             <p>{{ item.answer }}</p>
                         </div>
                     </div>

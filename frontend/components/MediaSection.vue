@@ -46,10 +46,7 @@ const handlePopup = (item) => {
     }
 }
 
-const handleGameStart = (e) => {
-    e.preventDefault();
-    alert("開始冒險！ (模擬功能)");
-}
+
 
 const updateClasses = (swiper) => {
     // Clear custom classes first
@@ -142,7 +139,7 @@ const updateClasses = (swiper) => {
                 <h2 class="section_title bold">踏上你的美味之旅</h2>
             </div>
             <div class="downalod_btn_wrap">
-                <a href="#" class="btn_deepyellow" @click="handleGameStart">立即訂購</a>
+                <NuxtLink to="/products" class="btn_deepyellow">立即訂購</NuxtLink>
             </div>
         </section>
     </div>

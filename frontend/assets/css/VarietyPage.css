@@ -3,37 +3,7 @@
    ============================== */
 
 
-/* ---------- 切換按鈕 ---------- */
-.variety_view_switcher {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding: 35px 0 10px;
-    background-color: #fdfbf7;
-}
 
-.variety_view_switcher button {
-    background: #fff;
-    border: 1px solid #e0d6cc;
-    padding: 10px 24px;
-    border-radius: 30px;
-    font-size: 14px;
-    color: #8d6e63;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'NaikaiFont', 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-}
-
-.variety_view_switcher button.active {
-    background: #5d4037;
-    color: #fff;
-    border-color: #5d4037;
-}
-
-.variety_view_switcher button:hover:not(.active) {
-    border-color: #dcb15c;
-    color: #dcb15c;
-}
 
 /* ---------- 通用 ---------- */
 .variety_section {
@@ -193,102 +163,7 @@
     overflow: hidden;
 }
 
-/* ============================
-   方案 B：左右交錯詳細介紹
-   ============================ */
 
-.variety_detail_row {
-    display: flex;
-    align-items: center;
-    gap: 60px;
-    margin-bottom: 70px;
-}
-
-.variety_detail_row:last-child {
-    margin-bottom: 0;
-}
-
-.variety_detail_row.reverse {
-    flex-direction: row-reverse;
-}
-
-.variety_detail_img_col {
-    flex: 1;
-}
-
-.variety_detail_img_wrap {
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(93, 64, 55, 0.12);
-}
-
-.variety_detail_img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.6s ease;
-}
-
-.variety_detail_img_wrap:hover .variety_detail_img {
-    transform: scale(1.03);
-}
-
-.variety_detail_text_col {
-    flex: 1;
-}
-
-.variety_detail_index {
-    font-family: 'Cinzel', serif;
-    font-size: 40px;
-    font-weight: 700;
-    color: rgba(220, 177, 92, 0.25);
-    display: block;
-    margin-bottom: 8px;
-    line-height: 1;
-}
-
-.variety_detail_name {
-    font-size: 26px;
-    color: #5d4037;
-    font-weight: 700;
-    margin-bottom: 16px;
-    letter-spacing: 0.08em;
-}
-
-.variety_detail_info {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-    margin-bottom: 18px;
-}
-
-.variety_detail_info span {
-    font-size: 13px;
-    color: #8d6e63;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.variety_detail_info i {
-    color: #dcb15c;
-    font-size: 13px;
-}
-
-.variety_detail_flavor {
-    font-size: 15px;
-    color: #dcb15c;
-    font-style: italic;
-    margin-bottom: 14px;
-    letter-spacing: 0.03em;
-}
-
-.variety_detail_desc {
-    font-size: 15px;
-    color: #777;
-    line-height: 2;
-}
 
 /* ============================
    RWD 響應式
@@ -297,31 +172,42 @@
 @media (max-width: 900px) {
 
     .variety_grid {
-        grid-template-columns: 1fr;
-        gap: 25px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .variety_grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
     }
 
-    .variety_detail_row,
-    .variety_detail_row.reverse {
-        flex-direction: column;
-        gap: 25px;
-        margin-bottom: 50px;
+    .variety_card_body {
+        padding: 14px 12px 18px;
     }
 
-    .variety_detail_name {
-        font-size: 22px;
+    .variety_card_name {
+        font-size: 15px;
     }
 
-    .variety_detail_index {
-        font-size: 30px;
+    .variety_card_flavor {
+        font-size: 11px;
     }
 
-    .variety_view_switcher {
-        padding: 25px 0 5px;
+    .variety_card_desc {
+        font-size: 12px;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
-    .variety_view_switcher button {
-        padding: 8px 18px;
-        font-size: 13px;
+    .variety_card_season {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .variety_card_origin {
+        font-size: 10px;
     }
 }

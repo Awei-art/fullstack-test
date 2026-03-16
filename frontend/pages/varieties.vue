@@ -64,8 +64,7 @@ const getColorCss = (colorName) => {
     return colorMap[colorName] || '#b39ddb'
 }
 
-// 目前顯示模式
-const viewMode = ref('grid') // 'grid' | 'detail'
+
 </script>
 
 <template>
@@ -74,15 +73,7 @@ const viewMode = ref('grid') // 'grid' | 'detail'
         <!-- Hero 橫幅 -->
         <HeroBanner title="品種介紹" subtitle="每一顆葡萄，都有獨特的風味故事" />
 
-        <!-- 切換模式按鈕 -->
-        <div class="variety_view_switcher">
-            <button :class="{ active: viewMode === 'grid' }" @click="viewMode = 'grid'">
-                <i class="fas fa-th-large"></i> 卡片瀏覽
-            </button>
-            <button :class="{ active: viewMode === 'detail' }" @click="viewMode = 'detail'">
-                <i class="fas fa-list"></i> 詳細介紹
-            </button>
-        </div>
+
 
         <!-- 載入中 -->
         <div v-if="pending" class="variety_loading">
@@ -91,8 +82,8 @@ const viewMode = ref('grid') // 'grid' | 'detail'
 
         <template v-else-if="varieties.length > 0">
 
-            <!-- ====== 方案 A：卡片格線 ====== -->
-            <section v-if="viewMode === 'grid'" class="variety_section variety_grid_section">
+            <!-- ====== 卡片格線 ====== -->
+            <section class="variety_section variety_grid_section">
                 <div class="variety_container">
                     <div class="variety_grid">
                         <div v-for="(v, i) in varieties" :key="v.id" class="variety_card">
@@ -109,35 +100,6 @@ const viewMode = ref('grid') // 'grid' | 'detail'
                                 <p v-if="v.flavor" class="variety_card_flavor">{{ v.flavor }}</p>
                                 <p v-if="v.description" class="variety_card_desc">{{ v.description }}</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ====== 方案 B：左右交錯詳細介紹 ====== -->
-            <section v-else class="variety_section variety_detail_section">
-                <div class="variety_container">
-                    <div 
-                        v-for="(v, i) in varieties" 
-                        :key="v.id" 
-                        class="variety_detail_row" 
-                        :class="{ reverse: i % 2 !== 0 }"
-                    >
-                        <div class="variety_detail_img_col">
-                            <div class="variety_detail_img_wrap">
-                                <img :src="getImageUrl(v.image) || getPlaceholder(i)" :alt="v.name" class="variety_detail_img">
-                            </div>
-                        </div>
-                        <div class="variety_detail_text_col">
-                            <span class="variety_detail_index">{{ String(i + 1).padStart(2, '0') }}</span>
-                            <h3 class="variety_detail_name">{{ v.name }}</h3>
-                            <div class="variety_detail_info">
-                                <span v-if="v.origin"><i class="fas fa-map-marker-alt"></i> {{ v.origin }}</span>
-                                <span v-if="v.season"><i class="fas fa-calendar-alt"></i> {{ v.season }}</span>
-                                <span v-if="v.color"><i class="fas fa-palette"></i> {{ v.color }}</span>
-                            </div>
-                            <p v-if="v.flavor" class="variety_detail_flavor">「{{ v.flavor }}」</p>
-                            <p v-if="v.description" class="variety_detail_desc">{{ v.description }}</p>
                         </div>
                     </div>
                 </div>

@@ -8,9 +8,7 @@
     z-index: 30;
     overflow: hidden;
     box-sizing: border-box;
-    /* background: url('../images/sale_banner_bg_v2.svg?v=3') no-repeat center center;  <-- Moved to ::after */
-    /* background-size: cover; */
-    min-height: 50px;
+    min-height: clamp(36px, 6vw, 50px);
 }
 
 .sale_event_banner .sale_link {
@@ -18,10 +16,9 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 10px 0;
-    font-size: 17px;
+    padding: clamp(6px, 1.5vw, 10px) 0;
+    font-size: clamp(12px, 2.5vw, 17px);
     color: #ffffff;
-    /* Deep Purple for contrast on gold */
     text-align: center;
     text-decoration: none;
     font-weight: 500;
@@ -102,10 +99,19 @@
 }
 
 @media (max-width: 1024px) {
-
-
     .sale_event_banner .sale_link {
-        font-size: 1rem;
-        padding: 10px;
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sale_event_banner .sale_link {
+        padding: 6px 8px;
+    }
+
+    .sale_event_banner .btn_go {
+        font-size: 9px;
+        padding: 2px 6px;
+        margin-left: 6px;
     }
 }

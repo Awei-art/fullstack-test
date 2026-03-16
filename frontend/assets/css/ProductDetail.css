@@ -370,6 +370,10 @@
         gap: 40px;
     }
 
+    .detail_gallery {
+        position: static; /* 移除手機版 sticky 效果 */
+    }
+
     .detail_gallery,
     .detail_info {
         flex: auto;

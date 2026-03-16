@@ -11,24 +11,26 @@ const modules = [Autoplay, EffectFade];
     <section class="intro_section">
         <div class="intro_container">
             <div class="intro_content">
-                <div class="intro_logo_area">
-                    <p style="font-size: 12px; color: #aaa; letter-spacing: 2px;">FROM TIANYUAN GREENHOUSE</p>
-                </div>
-
-                <div class="intro_text_wrap intro_desc">
+                <!-- 覆蓋在圖片上的標題 -->
+                <div class="intro_hero_text">
+                    <p class="intro_subtitle">FROM TIANYUAN GREENHOUSE</p>
                     <h2 class="intro_title">
                         <span style="--i:1">極</span><span style="--i:2">致</span><span style="--i:3">美</span><span
                             style="--i:4">感</span><span style="--i:5">，</span><span style="--i:6">濃</span><span
                             style="--i:7">郁</span><span style="--i:8">香</span><span style="--i:9">甜</span><span
                             style="--i:10">。</span>
                     </h2>
+                </div>
+
+                <!-- 圖片下方的描述文字 -->
+                <div class="intro_desc_body intro_desc desktop_split">
                     <p>在群山環繞的豐饒大地上，</p>
                     <p>沐浴著充足的陽光，</p>
                     <p>孕育出美麗的<strong>田原葡萄</strong>。</p>
                     <p>日夜溫差累積的甜度，</p>
                     <p>令人驚豔的濃郁風味！</p>
                     <p>每一顆都如此美麗，如此甘甜。</p>
-                    <p>這就是，田原溫室葡萄。</p>
+                    <p>這就是，<strong>田原溫室葡萄</strong>。</p>
                 </div>
             </div>
             

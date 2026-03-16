@@ -149,6 +149,39 @@ onUnmounted(() => {
                             <span>常見問題FAQ</span>
                         </NuxtLink>
                     </li>
+
+                    <!-- 手機版漢堡選單內的會員區塊（滾動後頭貼消失時才顯示） -->
+                    <li v-if="isScrolled" class="mobile_menu_user_area">
+                        <template v-if="userCookie">
+                            <NuxtLink to="/member" class="menu_user_info" @click="closeMenu">
+                                <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="menu_avatar">
+                                <svg v-else class="menu_avatar_icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                                    stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <span class="menu_user_name">{{ userCookie.nickname || userCookie.username || '會員中心' }}</span>
+                            </NuxtLink>
+                            <button class="menu_logout_btn" @click="handleLogout">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                登出
+                            </button>
+                        </template>
+                        <template v-else>
+                            <NuxtLink to="/login" class="menu_login_btn" @click="closeMenu">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor"
+                                    stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                登入 / 註冊
+                            </NuxtLink>
+                        </template>
+                    </li>
                 </ul>
             </nav>
 

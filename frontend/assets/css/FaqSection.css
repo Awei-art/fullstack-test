@@ -103,22 +103,16 @@
     color: #fff;
     padding: 15px 25px;
     border-radius: 4px;
-    cursor: pointer;
+    cursor: default;
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 15px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
     position: relative;
     display: block;
     width: 100%;
     text-align: left;
     border: none;
     outline: none;
-}
-
-.faq_question:hover {
-    background-color: #c99f4a;
-    transform: translateY(-2px);
 }
 
 .faq_answer {
@@ -144,10 +138,6 @@
 
 .faq_block.shipping .faq_question {
     background-color: #8e735b;
-}
-
-.faq_block.shipping .faq_question:hover {
-    background-color: #7a614d;
 }
 
 /* Responsive */

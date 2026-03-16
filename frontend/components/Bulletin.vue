@@ -85,11 +85,11 @@ async function fetchBulletins() {
 
             <!-- Right Side: Promo Stack -->
             <div class="promo_stack">
-                <NuxtLink to="#" class="promo_btn">
-                    <img src="/images/test001.png" alt="Promo 1">
+                <NuxtLink to="/products" class="promo_btn">
+                    <img src="/images/promo_banner_tart.png" alt="草莓與葡萄塔饗宴">
                 </NuxtLink>
-                <NuxtLink to="#" class="promo_btn">
-                    <img src="/images/test002.png" alt="Promo 2">
+                <NuxtLink to="/desserts" class="promo_btn">
+                    <img src="/images/promo_banner_grid.png" alt="甜點禮物大賞">
                 </NuxtLink>
             </div>
         </div>

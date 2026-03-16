@@ -148,18 +148,17 @@
 
 .product_price {
     font-size: 1.1rem;
-    color: #000;
+    color: #e8627c;
     font-weight: 700;
     font-family: "Noto Sans JP", sans-serif;
     margin-bottom: 15px;
-    /* Space before buttons */
 }
 
 .product_price small {
     font-size: 1rem;
     font-weight: 500;
     margin-right: 5px;
-    color: #333;
+    color: #e8627c;
 }
 
 .product_footer {
@@ -230,13 +229,43 @@
 
 @media (max-width: 600px) {
     .product_grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
+        row-gap: 24px;
     }
 
     .product_card {
         max-width: 100%;
-        /* Full width on mobile */
-        margin-bottom: 40px;
+        margin-bottom: 0;
+    }
+
+    .product_badge {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+    }
+
+    .product_name {
+        font-size: 0.9rem;
+    }
+
+    .product_price {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .btn_view_product {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+        margin-right: 8px;
+    }
+
+    .btn_add_cart {
+        font-size: 1rem;
+        padding: 5px;
+    }
+
+    .product_footer {
+        padding: 0 2px;
     }
 }
 
@@ -265,8 +294,9 @@
 
 /* 禁用按鈕樣式 */
 .btn_add_cart.btn-disabled {
-    background-color: #ccc;
+    background-color: transparent;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
-    /* 取消原本可能的 hover 效果 */
+    color: #ccc;
 }

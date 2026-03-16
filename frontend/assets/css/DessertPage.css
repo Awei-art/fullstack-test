@@ -351,11 +351,48 @@
 
 @media (max-width: 600px) {
     .dessert_grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
+        row-gap: 24px;
     }
 
     .dessert_card {
         max-width: 100%;
-        margin-bottom: 40px;
+        margin-bottom: 0;
+    }
+
+    .dessert_card_flavor_badge {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+    }
+
+    .dessert_card_name {
+        font-size: 0.9rem;
+    }
+
+    .dessert_card_price {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .btn_view_dessert {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+        margin-right: 8px;
+    }
+
+    .btn_add_cart {
+        font-size: 1rem;
+        padding: 5px;
+    }
+
+    .dessert_card_footer {
+        padding: 0 2px;
+    }
+
+    .dessert_card_desc {
+        font-size: 11px;
+        padding: 0 4px;
+        margin-bottom: 8px;
     }
 }
