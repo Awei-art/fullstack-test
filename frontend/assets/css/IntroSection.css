@@ -173,7 +173,7 @@
         height: 420px;
         min-height: 420px;
         width: 100%;
-        margin-top: calc(-1 * var(--header-height));
+        margin-top: 0;
         padding-top: 0;
         border-radius: 0;
         box-shadow: none;

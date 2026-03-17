@@ -131,7 +131,7 @@ const handleLogin = async () => {
 
       <!-- 卡片標題 -->
       <div class="card-header">
-        <img src="/images/logo_icon.svg" alt="Logo" class="logo" />
+        <img src="/images/logo_icon.svg" alt="Logo" class="login-logo" />
         <h2 class="title">會員登入</h2>
       </div>
 

@@ -132,85 +132,44 @@
 /* RWD for Mobile */
 @media (max-width: 768px) {
     .sidebar-container {
-        width: 100%;
-        padding: 16px;
-        margin-bottom: 20px;
+        display: none !important; /* 在手機版隱藏此側欄卡片，因為已整合進漢堡選單內 */
     }
 
-    /* Compact profile for mobile or hide it if banner shows info */
+    /* Compact profile for mobile */
     .profile-section {
         flex-direction: row;
         padding-bottom: 16px;
         margin-bottom: 16px;
-        gap: 12px;
+        gap: 16px;
+        justify-content: flex-start;
     }
 
     .avatar {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         margin-bottom: 0;
     }
 
-    .menu-list {
-        flex-direction: row;
-        overflow-x: auto;
-        white-space: nowrap;
-        gap: 12px;
-        padding-bottom: 5px;
-        /* Space for scrollbar */
-        /* Hide scrollbar for cleaner look */
-        -ms-overflow-style: none;
-        /* IE and Edge */
-        scrollbar-width: none;
-        /* Firefox */
-    }
-
-    .menu-list::-webkit-scrollbar {
-        display: none;
-    }
-
-    .menu-item {
-        flex-shrink: 0;
-    }
-
-    .menu-link {
-        padding: 8px 16px;
-        background-color: #f5f5f5;
-        border-radius: 20px;
-        /* Pill shape for tabs */
-        border-left: none !important;
-        /* Remove side border for tabs */
-    }
-
-    .menu-link.active {
-        background-color: #C1A96C;
-        color: white;
+    .user-name {
+        font-size: 18px;
     }
 
     .logout-btn {
-        display: none;
-        /* Often hide logout in tabs, or move to a separate settings area */
+        display: block; /* 電腦版有的登出，手機版也同步保留 */
+        margin-top: 16px;
+        padding: 10px;
     }
 
-    /* Sub Menu Adjustments */
-    .sub-menu-list {
-        display: flex;
-        flex-direction: row;
-        padding-left: 0;
-        margin: 0;
-        gap: 12px;
+    /* 手機版不再做特規的小膠囊按鈕，而是直接維持電腦版的「垂直滿版選單」設計！ */
+    /* 電腦版的 .menu-link 包含 active 金邊特效，在手機版也會一模一樣呈現。 */
+    
+    .menu-link {
+        font-size: 16px;
+        padding: 14px 16px; /* 稍微加大一點讓手機更好按 */
     }
 
     .sub-menu-link {
-        padding: 8px 16px;
-        background-color: #f5f5f5;
-        border-radius: 20px;
-        white-space: nowrap;
-    }
-
-    .sub-menu-link.active,
-    .sub-menu-link.router-link-active {
-        background-color: #C1A96C;
-        color: white;
+        font-size: 15px;
+        padding: 12px 16px;
     }
 }

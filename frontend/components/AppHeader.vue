@@ -1,7 +1,37 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import MiniCart from '@/components/MiniCart.vue'
+
+const route = useRoute()
+const isMemberRoute = computed(() => route.path.startsWith('/member'))
+
+// 會員中心選單清單
+const memberMenuItems = ref([
+  { 
+    name: '帳號資訊', 
+    link: '/member',
+    subItems: [
+      { name: '會員基本資料', link: '/member/profile' },
+      { name: '修改登入密碼', link: '/member/password' }
+    ]
+  },
+  { 
+    name: '訂單狀態', 
+    link: '/member/orders',
+  },
+  { name: '我的優惠券', link: '/member/coupons' },
+  { name: '收件地址管理', link: '/member/address' },
+])
+
+const isParentActive = (item) => {
+  if (route.path === item.link) return true;
+  if (item.subItems) {
+    return item.subItems.some(sub => route.path.startsWith(sub.link));
+  }
+  return false;
+}
 
 // 取得使用者 Cookie
 const userCookie = useCookie('user_info')
@@ -41,18 +71,28 @@ const isUserMenuOpen = ref(false)
 const userMenuRef = ref(null)
 
 const handleUserMenuClick = (e) => {
-    // 只有在手機版才防止直接跳轉並顯示選單
-    if (window.innerWidth <= 900) {
-        isUserMenuOpen.value = !isUserMenuOpen.value
-    } else {
-        // 桌機板直接跳轉會員中心
-        closeUserMenu()
-        navigateTo('/member')
-    }
+    // 手機版和桌機版都可以 toggle 選單
+    isUserMenuOpen.value = !isUserMenuOpen.value
 }
 
 const closeUserMenu = () => {
     isUserMenuOpen.value = false
+}
+
+// 桌機版 Hover 顯示下拉選單（帶延遲避免閃爍）
+let hoverTimer = null
+const handleMouseEnter = () => {
+    if (window.innerWidth > 900) {
+        if (hoverTimer) clearTimeout(hoverTimer)
+        isUserMenuOpen.value = true
+    }
+}
+const handleMouseLeave = () => {
+    if (window.innerWidth > 900) {
+        hoverTimer = setTimeout(() => {
+            isUserMenuOpen.value = false
+        }, 300)
+    }
 }
 
 const toggleMenu = () => {
@@ -63,12 +103,34 @@ const closeMenu = () => {
     isMenuOpen.value = false
 }
 
-// 手機版子選單展開
+// 手機版子選單展開（如果是無法點擊的純展開選項）
 const toggleSubmenu = (e) => {
     if (window.innerWidth <= 900) {
         e.preventDefault()
         const li = e.currentTarget.closest('.has_submenu')
         if (li) li.classList.toggle('open')
+    }
+}
+
+// 支援「本身有連結、又帶有子選單」的手機版混合展開邏輯
+const handleSubmenuLinkClick = (e) => {
+    if (window.innerWidth <= 900) {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const clickX = e.clientX
+        
+        // CSS 中箭頭寫在 ::after (right: 30px)
+        // 若使用者點擊選單列最右側 80px 的區域，判定為「點下箭頭」，只展開不跳轉
+        if (rect.right - clickX < 80) {
+            e.preventDefault()
+            const li = e.currentTarget.closest('.has_submenu')
+            if (li) li.classList.toggle('open')
+        } else {
+            // 點擊左側文字區域，關閉選單並進行頁面跳轉
+            closeMenu()
+        }
+    } else {
+        // 電腦版直接關閉選單即可，Hover 本身就會觸發展開顯示
+        closeMenu()
     }
 }
 
@@ -97,7 +159,7 @@ onUnmounted(() => {
 
 <template>
     <header class="header_wrap grape-theme">
-        <div class="header" :class="{ 'mobile-menu-open': isMenuOpen, 'scrolled': isScrolled }" ref="headerRef">
+        <div class="header" :class="{ 'mobile-menu-open': isMenuOpen, 'scrolled': isScrolled, 'is-member-route': isMemberRoute }" ref="headerRef">
             <h1 class="logo">
                 <NuxtLink to="/" class="logo_link">
                     <img src="/images/logo_icon.svg" alt="田原葡萄Icon" class="logo_icon">
@@ -108,21 +170,46 @@ onUnmounted(() => {
             <nav>
                 <ul class="header_menu_wrap" :style="{ display: isMenuOpen ? 'flex' : '' }">
                     <li class="mobile_menu_logo_item">
-                        <NuxtLink to="/">
+                        <NuxtLink to="/" @click="closeMenu">
                             <img src="/images/menu_header.png" alt="田原溫室">
                         </NuxtLink>
                     </li>
-                    <li class="node1">
+                    
+                    <!-- 會員中心專屬導覽選單（僅在手機版 & 會員頁面顯示） -->
+                    <li class="node1 member-nav-item" :class="{ 'has_submenu': item.subItems }" v-for="item in memberMenuItems" :key="item.name">
+                        <!-- 如果有子選單 -->
+                        <template v-if="item.subItems">
+                            <NuxtLink :to="item.link" class="menu_link" :class="{ 'active': isParentActive(item) }" @click="handleSubmenuLinkClick">
+                                <span>{{ item.name }}</span>
+                            </NuxtLink>
+                            <ul class="submenu">
+                                <li v-for="sub in item.subItems" :key="sub.name">
+                                    <NuxtLink :to="sub.link" class="menu_link" exact-active-class="active" @click="closeMenu">
+                                        <span>{{ sub.name }}</span>
+                                    </NuxtLink>
+                                </li>
+                            </ul>
+                        </template>
+                        <!-- 如果沒有子選單 -->
+                        <template v-else>
+                            <NuxtLink :to="item.link" class="menu_link" :class="{ 'active': isParentActive(item) }" @click="closeMenu">
+                                <span>{{ item.name }}</span>
+                            </NuxtLink>
+                        </template>
+                    </li>
+                    
+                    <!-- 普通導覽選單（在手機版會員頁面時會被隱藏） -->
+                    <li class="node1 normal-nav-item">
                         <NuxtLink to="/news" class="menu_link" @click="closeMenu">
                             <span>最新消息</span>
                         </NuxtLink>
                     </li>
-                    <li class="node1">
+                    <li class="node1 normal-nav-item">
                         <NuxtLink to="/about" class="menu_link" @click="closeMenu">
                             <span>關於田原</span>
                         </NuxtLink>
                     </li>
-                    <li class="node1 has_submenu">
+                    <li class="node1 has_submenu normal-nav-item">
                         <a href="#" class="menu_link" @click.prevent="toggleSubmenu">
                             <span>線上商店</span>
                         </a>
@@ -139,19 +226,19 @@ onUnmounted(() => {
                             </li>
                         </ul>
                     </li>
-                    <li class="node1">
+                    <li class="node1 normal-nav-item">
                         <NuxtLink to="/varieties" class="menu_link" @click="closeMenu">
                             <span>品種介紹</span>
                         </NuxtLink>
                     </li>
-                    <li class="node1">
+                    <li class="node1 normal-nav-item">
                         <NuxtLink to="/faq" class="menu_link" @click="closeMenu">
                             <span>常見問題FAQ</span>
                         </NuxtLink>
                     </li>
 
-                    <!-- 手機版漢堡選單內的會員區塊（滾動後頭貼消失時才顯示） -->
-                    <li v-if="isScrolled" class="mobile_menu_user_area">
+                    <!-- 手機版漢堡選單內的會員區塊（滾動後頭貼消失時才顯示，但如果是會員中心專屬選單則不顯示） -->
+                    <li v-if="isScrolled && !isMemberRoute" class="mobile_menu_user_area">
                         <template v-if="userCookie">
                             <NuxtLink to="/member" class="menu_user_info" @click="closeMenu">
                                 <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="menu_avatar">
@@ -171,16 +258,14 @@ onUnmounted(() => {
                                 登出
                             </button>
                         </template>
-                        <template v-else>
-                            <NuxtLink to="/login" class="menu_login_btn" @click="closeMenu">
-                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor"
-                                    stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                登入 / 註冊
-                            </NuxtLink>
-                        </template>
+                        <NuxtLink v-else to="/login" class="menu_login_btn" @click="closeMenu">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor"
+                                stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            登入
+                        </NuxtLink>
                     </li>
                 </ul>
             </nav>
@@ -203,7 +288,7 @@ onUnmounted(() => {
                     </svg>
                 </NuxtLink>
                 <!-- 登入後顯示會員頭貼 -->
-                <div v-else class="header-user-wrapper" ref="userMenuRef">
+                <div v-else class="header-user-wrapper" ref="userMenuRef" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
                     <a href="#" class="btn_login logged-in" @click.prevent="handleUserMenuClick">
                         <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="header-avatar">
                         <svg v-else class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
@@ -214,24 +299,21 @@ onUnmounted(() => {
                         <span class="btn_text user-name desktop-only">{{ userCookie.username || '會員中心' }}</span>
                     </a>
 
-                    <!-- 手機版的頭像下拉選單 -->
+                    <!-- 頭像下拉選單 (桌機 Hover / 手機 Click) -->
                     <transition name="fade">
-                        <div v-show="isUserMenuOpen" class="mobile-user-dropdown">
+                        <div v-show="isUserMenuOpen" class="user-dropdown">
+                            <!-- 整合進來的購物車（僅手機版顯示） -->
+                            <button @click="(e) => { closeUserMenu(); openMiniCart(e); }" class="dropdown-link mobile-only" style="width: 100%; border: none; background: transparent; cursor: pointer;">
+                                <span style="position: relative; display: inline-block;">
+                                    <span v-if="cartTotalQty > 0" class="cart_badge" style="position: absolute; top: -8px; left: auto; right: -18px; transform: none; margin: 0; display: flex; width: 20px; height: 20px; font-size: 11px; align-items: center; justify-content: center;">{{ cartTotalQty }}</span>
+                                    購物車
+                                </span>
+                            </button>
                             <NuxtLink to="/member" class="dropdown-link" @click="closeUserMenu">會員中心</NuxtLink>
                             <button @click="handleLogout" class="dropdown-link text-danger">登出</button>
                         </div>
                     </transition>
                 </div>
-                
-                <!-- 登出按鈕 (登入後才有，且只在桌機版顯示) -->
-                <button v-if="userCookie" @click="handleLogout" class="header-logout-btn desktop-only">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    登出
-                </button>
             </div>
 
             <button type="button" class="btn_all_menu" :class="{ active: isMenuOpen }" @click.stop="toggleMenu">
@@ -315,36 +397,14 @@ onUnmounted(() => {
     font-size: 16px;
 }
 
-/* 頂端登出按鈕 */
-.header-logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: transparent;
-    border: 1px solid var(--grape-primary); /* 邊框與文字同色 */
-    color: var(--grape-primary);
-    padding: 6px 12px;
-    border-radius: 6px; /* 這裡改為較方的圓角 6px */
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    /* 取消預設 button 樣式 */
-    outline: none;
-}
-.header-logout-btn:hover {
-    background: var(--grape-primary); /* Hover 填滿原本文字顏色的底色 */
-    color: #fff; /* 文字變白色 */
-    border-color: var(--grape-primary);
-}
-
 .header-user-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.mobile-user-dropdown {
-    display: none; /* 預設不顯示，由媒體查詢與 v-show 共同控制 */
+.user-dropdown {
+    display: flex; /* V-show 會直接控制這個元件 */
     position: absolute;
     top: 50px;
     right: 0;
@@ -385,15 +445,20 @@ onUnmounted(() => {
     font-weight: bold;
 }
 
+/* 僅手機版顯示的元素 */
+.mobile-only {
+    display: none !important;
+}
+
 @media (max-width: 900px) {
     /* 隱藏桌機版專屬按鈕與文字 */
     .desktop-only {
         display: none !important;
     }
 
-    /* 手機版才讓 dropdown 能以 flex 呈現 */
-    .mobile-user-dropdown {
-        display: flex;
+    /* 顯示手機版專屬元素 */
+    .mobile-only {
+        display: block !important;
     }
 
     /* 放大手機版的購物車與頭像圖示 */
