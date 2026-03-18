@@ -302,8 +302,8 @@ onUnmounted(() => {
                     <!-- 頭像下拉選單 (桌機 Hover / 手機 Click) -->
                     <transition name="fade">
                         <div v-show="isUserMenuOpen" class="user-dropdown">
-                            <!-- 整合進來的購物車（僅手機版顯示） -->
-                            <button @click="(e) => { closeUserMenu(); openMiniCart(e); }" class="dropdown-link mobile-only" style="width: 100%; border: none; background: transparent; cursor: pointer;">
+                            <!-- 整合進來的購物車（僅在會員相關頁面的手機版顯示） -->
+                            <button v-if="isMemberRoute" @click="(e) => { closeUserMenu(); openMiniCart(e); }" class="dropdown-link mobile-only" style="width: 100%; border: none; background: transparent; cursor: pointer;">
                                 <span style="position: relative; display: inline-block;">
                                     <span v-if="cartTotalQty > 0" class="cart_badge" style="position: absolute; top: -8px; left: auto; right: -18px; transform: none; margin: 0; display: flex; width: 20px; height: 20px; font-size: 11px; align-items: center; justify-content: center;">{{ cartTotalQty }}</span>
                                     購物車

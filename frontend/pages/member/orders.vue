@@ -338,6 +338,12 @@ async function goToPayment(order) {
   border-bottom: 2px solid #eee;
   margin-bottom: 20px;
   overflow-x: auto;
+  /* 隱藏滾動條但保持滑動 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.order_tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .tab_btn {

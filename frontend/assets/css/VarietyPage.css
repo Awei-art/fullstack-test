@@ -52,8 +52,7 @@
 
 .variety_card {
     background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
+    border-radius: 24px;
     box-shadow: 0 6px 24px rgba(93, 64, 55, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -138,30 +137,163 @@
 }
 
 .variety_card_name {
-    font-size: 20px;
-    color: #5d4037;
+    font-size: 24px; /* 加大文字，配合參考圖的視覺中心 */
+    color: #5A704f; /* 使用農場綠色調作為主標題色 */
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+    text-align: center; /* 標題置中 */
+}
+
+/* 參考圖的風格：分隔線 (使用者要求移除) */
+.variety_divider {
+    display: none;
+}
+
+.variety_card_tags {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #444;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+}
+
+.variety_spec {
+    text-align: center;
+    font-size: 14px;
+    color: #444;
     letter-spacing: 0.05em;
 }
 
 .variety_card_flavor {
-    font-size: 13px;
-    color: #dcb15c;
-    margin-bottom: 10px;
-    font-style: italic;
+    font-size: 15px; /* 稍微放大一點點讓斜體更清楚 */
+    color: #C1A96C; /* 金色 */
+    margin-bottom: 20px;
+    font-style: italic; /* 斜體 */
+    font-weight: 600; /* 加粗增強質感 */
+    letter-spacing: 0.05em;
+    text-align: center; /* 置中 */
 }
 
 .variety_card_desc {
     font-size: 14px;
-    color: #888;
-    line-height: 1.7;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    color: #444;
+    line-height: 1.8;
+    text-align: justify;
 }
+
+
+
+/* ============================
+   卡片新風格：圓形大圖 + 全白背景 (匹配參考圖)
+   ============================ */
+.variety_card {
+    background: #fff;
+    border-radius: 24px;
+    /* 移除了 overflow: hidden，讓超出邊界的裝飾能完整顯示 */
+    /* 給出類似參考圖的邊框與陰影 */
+    border: 1px solid #eaeaea;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 30px; /* 內縮版面 */
+    position: relative; /* 給裝飾元素定位用 */
+}
+
+.variety_card_img_wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 20px; /* 圖片置中並留下方距 */
+    border-radius: 50%; /* 把上面的圖砍成完整的圓形 */
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.variety_card:hover .variety_card_img_wrap img {
+    transform: scale(1.08); /* 圖片懸停稍微放大 */
+}
+
+
+/* Style 2: 禮物緞帶 (Gift Ribbon with Bow) */
+.deco-ribbon {
+    position: absolute;
+    top: -12px;
+    left: 8px; /* 向左移動，避免遮擋圖片 */
+    z-index: 20; /* 提高層級確保不被蓋住 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+}
+
+.bow {
+    position: relative;
+    width: 60px;
+    height: 26px;
+    z-index: 2;
+}
+
+/* 蝴蝶結左右翅膀 (使用旋轉的圓角方塊) */
+.bow::before, .bow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 24px;
+    background: linear-gradient(135deg, #FF4D6D 0%, #C9184A 100%);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.bow::before {
+    left: 2px;
+    transform: rotate(15deg);
+    border-radius: 12px 2px 12px 12px;
+}
+
+.bow::after {
+    right: 2px;
+    transform: rotate(-15deg);
+    border-radius: 2px 12px 12px 12px;
+}
+
+/* 蝴蝶結中心打結處 */
+.bow-center {
+    position: absolute;
+    top: 5px;
+    left: 23px;
+    width: 14px;
+    height: 14px;
+    background: #8e0e2e;
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.4);
+}
+
+/* 緞帶尾巴 */
+.ribbon-body {
+    position: relative;
+    background: linear-gradient(to bottom, #C9184A 0%, #A0113B 100%);
+    width: 32px;
+    height: 40px; /* 固定高度，因為沒有文字了 */
+    margin-top: -10px; /* 藏在蝴蝶結下方 */
+    z-index: 1;
+}
+
+/* 底部倒V缺口 */
+.ribbon-body::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    border-left: 16px solid #A0113B;
+    border-right: 16px solid #A0113B;
+    border-bottom: 15px solid transparent;
+}
+
+
+
 
 
 
@@ -181,30 +313,48 @@
 
     .variety_grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
+        gap: 10px; /* 縮小間距以騰出空間 */
+    }
+
+    .variety_card {
+        padding: 15px 10px; /* 大幅縮小內邊距 */
+        border-radius: 16px;
+    }
+
+    .variety_card_img_wrap {
+        width: 85%; /* 改為比例，避免固定 220px 撐破卡片 */
+        max-width: 140px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto 12px;
+    }
+
+    /* 手機版緞帶縮小 */
+    .deco-ribbon {
+        transform: scale(0.7); /* 整體縮小 70% */
+        top: -10px;
+        left: -5px;
     }
 
     .variety_card_body {
-        padding: 14px 12px 18px;
+        padding: 0; /* 移除額外 padding，由 card 控制 */
     }
 
     .variety_card_name {
-        font-size: 15px;
+        font-size: 16px;
+        margin-bottom: 8px;
     }
 
     .variety_card_flavor {
         font-size: 11px;
+        margin-bottom: 12px;
     }
 
     .variety_card_desc {
         font-size: 12px;
+        line-height: 1.5;
         -webkit-line-clamp: 2;
         line-clamp: 2;
-    }
-
-    .variety_card_season {
-        font-size: 10px;
-        padding: 3px 8px;
     }
 
     .variety_card_origin {

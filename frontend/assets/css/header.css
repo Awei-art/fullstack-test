@@ -714,12 +714,12 @@ nav {
     /* 漢堡選單內的會員區塊 */
     .mobile_menu_user_area {
         display: flex !important;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: center;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
         box-sizing: border-box;
-        gap: 20px;
+        gap: 10px;
         margin-top: 10px;
         padding: 15px 30px 20px;
     }
@@ -763,13 +763,14 @@ nav {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: transparent;
-        border: 1px solid var(--grape-primary);
-        border-radius: 6px;
-        color: var(--grape-primary);
-        font-size: 13px;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--grape-primary);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
         font-family: inherit;
         cursor: pointer;
         transition: all 0.2s;
@@ -778,8 +779,7 @@ nav {
     }
 
     .menu_logout_btn:hover {
-        background: var(--grape-primary);
-        color: #fff;
+        background: var(--grape-dark);
     }
 
     .menu_login_btn {

@@ -70,9 +70,8 @@ const getColorCss = (colorName) => {
 <template>
     <div class="variety_page">
 
-        <!-- Hero 橫幅 -->
+<!-- Hero 橫幅 -->
         <HeroBanner title="品種介紹" subtitle="每一顆葡萄，都有獨特的風味故事" />
-
 
 
         <!-- 載入中 -->
@@ -87,16 +86,26 @@ const getColorCss = (colorName) => {
                 <div class="variety_container">
                     <div class="variety_grid">
                         <div v-for="(v, i) in varieties" :key="v.id" class="variety_card">
+                            
+                            <!-- 禮物緞帶裝飾 -->
+                            <div class="deco-ribbon">
+                                <div class="bow">
+                                    <div class="bow-center"></div>
+                                </div>
+                                <div class="ribbon-body">
+                                </div>
+                            </div>
+
+                            <!-- 通用的圓形裁切與圖片 -->
                             <div class="variety_card_img_wrap">
                                 <img :src="getImageUrl(v.image) || getPlaceholder(i)" :alt="v.name" class="variety_card_img">
-                                <span v-if="v.season" class="variety_card_season">{{ v.season }}</span>
                             </div>
+
                             <div class="variety_card_body">
-                                <div class="variety_card_tags">
-                                    <span class="variety_card_color" :style="{ backgroundColor: getColorCss(v.color) }"></span>
-                                    <span v-if="v.origin" class="variety_card_origin">{{ v.origin }}</span>
-                                </div>
                                 <h3 class="variety_card_name">{{ v.name }}</h3>
+                                <!-- 產地與產季分隔線 -->
+
+
                                 <p v-if="v.flavor" class="variety_card_flavor">{{ v.flavor }}</p>
                                 <p v-if="v.description" class="variety_card_desc">{{ v.description }}</p>
                             </div>

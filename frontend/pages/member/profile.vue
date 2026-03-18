@@ -163,7 +163,7 @@ onMounted(() => {
                   <form @submit.prevent="handleSave" class="profile-form">
                     
                     <!-- 1. 暱稱 -->
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                       <label class="form-label">顯示暱稱</label>
                       <input 
                         v-model="form.nickname" 
