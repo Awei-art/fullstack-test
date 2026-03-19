@@ -30,5 +30,5 @@ RUN python manage.py collectstatic --noinput || true
 # 開放 8080 port
 EXPOSE 8080
 
-# 啟動 Gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8080", "--workers", "3"]
+# 啟動 Gunicorn 之前，先執行自動資料庫遷移 (migrate)
+CMD ["sh", "-c", "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8080 --workers 3"]
