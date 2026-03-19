@@ -1,11 +1,41 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage
+from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner
 
 #選擇品種回傳前端格式
 class VarietySerializer(serializers.ModelSerializer):
     class Meta:
         model = Variety
         fields = ['id', 'name', 'color'] # 確保有 name 和 color 
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    """首頁輪播圖序列化器"""
+    image = serializers.SerializerMethodField()
+    mobile_image = serializers.SerializerMethodField()
+    link_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Banner
+        fields = ['id', 'title', 'subtitle', 'image', 'mobile_image', 'link_url', 'order']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+        
+    def get_mobile_image(self, obj):
+        request = self.context.get('request')
+        if obj.mobile_image:
+            return request.build_absolute_uri(obj.mobile_image.url)
+        return None
+
+    def get_link_url(self, obj):
+        if obj.target_product:
+            return f"/products/{obj.target_product.id}"
+        if obj.target_dessert:
+            return f"/desserts/{obj.target_dessert.id}"
+        return obj.custom_link
 
 
 # 品種介紹頁專用（完整資料）
@@ -335,12 +365,14 @@ class CreateOrderSerializer(serializers.Serializer):
         discount_amount = 0
         coupon = None
         if coupon_code:
-            from .models import Coupon
+            from .models import Coupon, UserCoupon
             try:
                 coupon = Coupon.objects.select_for_update().get(code=coupon_code)
                 is_valid, msg = coupon.is_valid(subtotal)
                 if not is_valid:
                     raise serializers.ValidationError(f"優惠券無效：{msg}")
+                if UserCoupon.objects.filter(user=user, coupon=coupon, is_used=True).exists():
+                    raise serializers.ValidationError("您已經使用過此優惠代碼，無法重複使用。")
                 discount_amount = coupon.calculate_discount(subtotal, shipping_fee)
             except Coupon.DoesNotExist:
                 raise serializers.ValidationError("優惠代碼不存在")

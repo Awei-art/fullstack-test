@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner
 # Register your models here.
 
 #定義品種頁 顯示有貨
@@ -39,7 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'price', 'stock', 'is_mixed', 'get_spec_display', 'mix_limit')
     list_editable = ('mix_limit',)
     list_filter = ('category',)
-    filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
+    search_fields = ('name',)
     filter_horizontal = ('varieties',) # ✨ 讓選擇品種時變成好用的左右選單
     #放在同一個頁面最下方
     inlines = [ProductImageInline, ProductGradeInline] # 讓詳細圖出現在同一個頁面
@@ -142,3 +142,27 @@ class DessertAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name', 'flavor')
     inlines = [DessertImageInline, DessertGradeInline]
+
+
+# ========================================
+# 首頁橫幅管理 Banner
+# ========================================
+
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ('title', 'image', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'subtitle')
+    ordering = ('order', '-id')
+    autocomplete_fields = ('target_product', 'target_dessert')
+    
+    fieldsets = (
+        ('基本資訊', {
+            'fields': ('title', 'subtitle', 'image', 'mobile_image', 'is_active', 'order')
+        }),
+        ('跳轉連結設定 (三選一)', {
+            'fields': ('target_product', 'target_dessert', 'custom_link'),
+            'description': '請選擇您想跳轉的目的地。若有選擇一般/甄點商品，會優先跳轉到該商品頁！'
+        }),
+    )

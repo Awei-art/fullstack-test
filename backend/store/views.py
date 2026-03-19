@@ -8,13 +8,13 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import Product, Order, Bulletin, NewsCategory, News, Variety, DessertCategory, Dessert, ProductCategory
+from .models import Product, Order, Bulletin, NewsCategory, News, Variety, DessertCategory, Dessert, ProductCategory, Banner
 from .serializers import (
     ProductSerializer, OrderSerializer, OrderListSerializer, CreateOrderSerializer, BulletinSerializer,
     NewsCategorySerializer, NewsListSerializer, NewsDetailSerializer,
     VarietyDetailSerializer,
     DessertCategorySerializer, DessertSerializer,
-    ProductCategorySerializer
+    ProductCategorySerializer, BannerSerializer
 )
 from .ecpay import create_ecpay_payment, verify_check_mac_value
 import logging
@@ -139,6 +139,13 @@ class ProductCategoryListView(generics.ListAPIView):
     serializer_class = ProductCategorySerializer
     permission_classes = [AllowAny]
     queryset = ProductCategory.objects.filter(is_active=True)
+
+
+class BannerListView(generics.ListAPIView):
+    """GET /api/banners/ — 首頁輪播圖列表"""
+    serializer_class = BannerSerializer
+    permission_classes = [AllowAny]
+    queryset = Banner.objects.filter(is_active=True)
 
 
 @api_view(['GET'])
@@ -373,6 +380,11 @@ class ValidateCouponView(APIView):
             
             if not is_valid:
                 return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # 檢查使用者是否已經使用過這張券
+            from .models import UserCoupon
+            if UserCoupon.objects.filter(user=request.user, coupon=coupon, is_used=True).exists():
+                return Response({'error': '您已經使用過此優惠代碼，無法重複使用。'}, status=status.HTTP_400_BAD_REQUEST)
                 
             discount_amount = coupon.calculate_discount(subtotal, shipping_fee)
             

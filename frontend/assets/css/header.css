@@ -14,7 +14,7 @@
 }
 
 html, body {
-    overflow-x: hidden; /* 禁止水平滾動，防止手機版左右晃動 */
+    overflow-x: clip; /* 使用 clip 取代 hidden，讓 sticky header 生效，同時防止手機版橫向捲動 */
 }
 
 body {

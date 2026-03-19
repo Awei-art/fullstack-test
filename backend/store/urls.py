@@ -8,10 +8,12 @@ from .views import (
     NewsCategoryListView, NewsListView, NewsDetailView,
     VarietyListView,
     DessertCategoryListView, DessertListView, DessertDetailView,
-    ProductCategoryListView
+    ProductCategoryListView, BannerListView
 )
 
 urlpatterns = [
+    # 首頁輪播圖 API
+    path('banners/', BannerListView.as_view(), name='banner-list'),
     # 公告 API
     path('bulletins/', BulletinListAPIView.as_view(), name='bulletin-list'),
 

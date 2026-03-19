@@ -1,6 +1,26 @@
 from django.db import models
 from django.contrib import admin
 
+class Banner(models.Model):
+    title = models.CharField(max_length=100, blank=True, verbose_name="大標題")
+    subtitle = models.TextField(blank=True, verbose_name="副標題/內文")
+    image = models.ImageField(upload_to='banners/', verbose_name="電腦版圖片", help_text="建議尺寸: 1400x600")
+    mobile_image = models.ImageField(upload_to='banners/', blank=True, null=True, verbose_name="手機版圖片 (選填)", help_text="若無則自動縮放電腦版圖片。建議尺寸: 800x800")
+    target_product = models.ForeignKey('Product', null=True, blank=True, on_delete=models.SET_NULL, verbose_name="推薦一般商品", help_text="若選擇，點擊圖片會自動跳轉到此商品")
+    target_dessert = models.ForeignKey('Dessert', null=True, blank=True, on_delete=models.SET_NULL, verbose_name="推薦甄點商品", help_text="若選擇，點擊圖片會自動跳轉到此甄點商品")
+    custom_link = models.CharField(max_length=500, blank=True, verbose_name="自訂跳轉網址", help_text="如果您想連結到外部網頁 (如 FB 或 Line) 或其他頁面，請在此填寫 (例如: https://...)")
+    order = models.IntegerField(default=0, verbose_name="排序", help_text="數字越小排越前面")
+    is_active = models.BooleanField(default=True, verbose_name="是否上架")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
+
+    class Meta:
+        ordering = ['order', '-id']
+        verbose_name = "首頁輪播圖"
+        verbose_name_plural = "首頁輪播圖"
+
+    def __str__(self):
+        return f"{self.title or '未命名橫幅'} (排序: {self.order})"
+
 # 品種表
 class Variety(models.Model):
     name = models.CharField(max_length=100, verbose_name="品種名稱")
