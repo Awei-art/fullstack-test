@@ -391,7 +391,8 @@ class CreateOrderSerializer(serializers.Serializer):
             coupon.used_count += 1
             coupon.save()
             # 若為錢包內的優惠券，則標記為已使用並記錄關聯訂單
-            user_coupon = UserCoupon.objects.filter(user=user, coupon=coupon, is_used=False).first()
+            # 若為錢包內的優惠券，或者是曾經用過的
+            user_coupon = UserCoupon.objects.filter(user=user, coupon=coupon).first()
             from django.utils import timezone
             if user_coupon:
                 user_coupon.is_used = True
