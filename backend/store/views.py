@@ -8,13 +8,13 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import Product, Order, Bulletin, NewsCategory, News, Variety, DessertCategory, Dessert, ProductCategory, Banner
+from .models import Product, Order, Bulletin, NewsCategory, News, Variety, DessertCategory, Dessert, ProductCategory, Banner, SiteImage
 from .serializers import (
     ProductSerializer, OrderSerializer, OrderListSerializer, CreateOrderSerializer, BulletinSerializer,
     NewsCategorySerializer, NewsListSerializer, NewsDetailSerializer,
     VarietyDetailSerializer,
     DessertCategorySerializer, DessertSerializer,
-    ProductCategorySerializer, BannerSerializer
+    ProductCategorySerializer, BannerSerializer, SiteImageSerializer
 )
 from .ecpay import create_ecpay_payment, verify_check_mac_value
 import logging
@@ -146,6 +146,13 @@ class BannerListView(generics.ListAPIView):
     serializer_class = BannerSerializer
     permission_classes = [AllowAny]
     queryset = Banner.objects.filter(is_active=True)
+
+
+class SiteImageListView(generics.ListAPIView):
+    """GET /api/site-images/ — 網站素材庫全部圖片"""
+    serializer_class = SiteImageSerializer
+    permission_classes = [AllowAny]
+    queryset = SiteImage.objects.all()
 
 
 @api_view(['GET'])

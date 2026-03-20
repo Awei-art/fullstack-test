@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner
+from .models import Product, ProductImage, Variety, ProductGrade, Coupon, UserCoupon, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner, SiteImage
 
 #選擇品種回傳前端格式
 class VarietySerializer(serializers.ModelSerializer):
@@ -36,6 +36,32 @@ class BannerSerializer(serializers.ModelSerializer):
         if obj.target_dessert:
             return f"/desserts/{obj.target_dessert.id}"
         return obj.custom_link
+
+
+class SiteImageSerializer(serializers.ModelSerializer):
+    """網站素材庫序列化器"""
+    image = serializers.SerializerMethodField()
+    link_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SiteImage
+        fields = ['id', 'key', 'label', 'group', 'image', 'title', 'description', 'link_url', 'alt_text']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+    def get_link_url(self, obj):
+        """優先順序：推薦商品 > 推薦甜點 > 站內頁面 > 自訂連結"""
+        if obj.target_product:
+            return f"/products/{obj.target_product.id}"
+        if obj.target_dessert:
+            return f"/desserts/{obj.target_dessert.id}"
+        if obj.link_page:
+            return obj.link_page
+        return obj.custom_link or ''
 
 
 # 品種介紹頁專用（完整資料）

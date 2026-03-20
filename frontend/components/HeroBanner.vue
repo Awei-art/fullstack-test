@@ -1,5 +1,7 @@
 <script setup>
-defineProps({
+const { getByKey } = await useSiteImages()
+
+const props = defineProps({
   title: {
     type: String,
     required: true
@@ -10,10 +12,15 @@ defineProps({
     default: ''
   }
 })
+
+const heroBg = getByKey('hero_banner', '/images/hero_banner.jpg')
+const bgStyle = computed(() => ({
+  backgroundImage: `url(${heroBg})`
+}))
 </script>
 
 <template>
-  <section class="hero_banner">
+  <section class="hero_banner" :style="bgStyle">
     <div class="hero_overlay"></div>
     <div class="hero_content">
       <h1 class="hero_title">{{ title }}</h1>
@@ -31,6 +38,9 @@ defineProps({
   height: 480px;
   /* 調整顯示位置往下一點（利用 background-position: center 20%） */
   background: url('../public/images/hero_banner.jpg') center 20% / cover no-repeat;
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

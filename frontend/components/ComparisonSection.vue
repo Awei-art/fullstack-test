@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 
+const { getByKey } = await useSiteImages()
+
 const containerRef = ref(null)
 const sliderValue = ref(50) // Default 50%
 let isDragging = false
@@ -74,11 +76,11 @@ onUnmounted(() => {
                 @touchstart="startDrag"
             >
                 <!-- Back Image (Right Side: Mochi 01) -->
-                <img src="/images/mochi01.png" alt="Mochi 01" class="comp-img comp-img-back">
+                <img :src="getByKey('comparison_right', '/images/mochi01.png')" alt="Mochi 01" class="comp-img comp-img-back">
 
                 <!-- Front Image (Left Side: Mochi 02) -->
                 <img 
-                    src="/images/mochi02.png" 
+                    :src="getByKey('comparison_left', '/images/mochi02.png')" 
                     alt="Mochi 02" 
                     class="comp-img comp-img-front"
                     :style="{ clipPath: `inset(0 ${100 - sliderValue}% 0 0)` }"

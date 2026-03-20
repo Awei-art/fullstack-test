@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 const config = useRuntimeConfig()
 
+const { getByKey, getLinkByKey } = await useSiteImages()
+
 const newsList = ref([])
 const isLoading = ref(true)
 
@@ -85,11 +87,11 @@ async function fetchBulletins() {
 
             <!-- Right Side: Promo Stack -->
             <div class="promo_stack">
-                <NuxtLink to="/products" class="promo_btn">
-                    <img src="/images/promo_banner_tart.png" alt="草莓與葡萄塔饗宴">
+                <NuxtLink :to="getLinkByKey('promo_tart', '/products')" class="promo_btn">
+                    <img :src="getByKey('promo_tart', '/images/promo_banner_tart.png')" alt="草莓與葡萄塔饗宴">
                 </NuxtLink>
-                <NuxtLink to="/desserts" class="promo_btn">
-                    <img src="/images/promo_banner_grid.png" alt="甜點禮物大賞">
+                <NuxtLink :to="getLinkByKey('promo_grid', '/desserts')" class="promo_btn">
+                    <img :src="getByKey('promo_grid', '/images/promo_banner_grid.png')" alt="甜點禮物大賞">
                 </NuxtLink>
             </div>
         </div>

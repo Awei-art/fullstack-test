@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner
+from .models import Variety, Product, ProductImage, ProductGrade, Order, OrderItem, Coupon, UserCoupon, Bulletin, NewsCategory, News, DessertCategory, Dessert, ProductCategory, DessertGrade, DessertImage, Banner, SiteImage
 # Register your models here.
 
 #定義品種頁 顯示有貨
@@ -166,3 +166,46 @@ class BannerAdmin(admin.ModelAdmin):
             'description': '請選擇您想跳轉的目的地。若有選擇一般/甄點商品，會優先跳轉到該商品頁！'
         }),
     )
+
+
+# ========================================
+# 網站素材庫管理
+# ========================================
+from django.utils.html import format_html
+
+@admin.register(SiteImage)
+class SiteImageAdmin(admin.ModelAdmin):
+    list_display = ('key', 'label', 'group', 'image_preview', 'updated_at')
+    list_filter = ('group',)
+    search_fields = ('key', 'label')
+    list_display_links = ('key',)
+    readonly_fields = ('image_preview_large', 'updated_at')
+    autocomplete_fields = ('target_product', 'target_dessert')
+
+    fieldsets = (
+        ('基本資訊', {
+            'fields': ('key', 'label', 'group', 'image', 'alt_text', 'image_preview_large', 'updated_at')
+        }),
+        ('搭配文字 (選填)', {
+            'fields': ('title', 'description'),
+            'classes': ('collapse',),
+            'description': '標題/說明文字用於安心農產等區塊。留空則使用預設值。'
+        }),
+        ('跳轉設定 (選填，四選一，由上往下優先)', {
+            'fields': ('target_product', 'target_dessert', 'link_page', 'custom_link'),
+            'classes': ('collapse',),
+            'description': '① 推薦商品 → ② 推薦甜點 → ③ 站內頁面 → ④ 自訂網址。只要填一個即可，系統會依照優先順序處理。'
+        }),
+    )
+
+    @admin.display(description='預覽')
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height:50px; border-radius:4px;" />', obj.image.url)
+        return '-'
+
+    @admin.display(description='目前圖片')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height:200px; border-radius:8px;" />', obj.image.url)
+        return '尚未上傳圖片'

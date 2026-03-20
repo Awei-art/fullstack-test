@@ -3,35 +3,37 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
+const { getByKey } = await useSiteImages()
+
 const mediaList = [
     {
         type: 'image',
         url: null,
-        img: '/images/grape01.png',
+        img: getByKey('media_01', '/images/grape01.png'),
         alt: '特級葡萄'
     },
     {
         type: 'image',
         url: null,
-        img: '/images/grape02.png',
+        img: getByKey('media_02', '/images/grape02.png'),
         alt: '溫室栽培'
     },
     {
         type: 'image',
         url: null,
-        img: '/images/grape03.png',
+        img: getByKey('media_03', '/images/grape03.png'),
         alt: '甜度保證'
     },
     {
         type: 'image',
         url: null,
-        img: '/images/grape04.png',
+        img: getByKey('media_04', '/images/grape04.png'),
         alt: '新鮮採摘'
     },
     {
         type: 'image',
         url: null,
-        img: '/images/grape07.png',
+        img: getByKey('media_05', '/images/grape07.png'),
         alt: '特選葡萄'
     }
 ]

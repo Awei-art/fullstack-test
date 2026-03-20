@@ -21,6 +21,73 @@ class Banner(models.Model):
     def __str__(self):
         return f"{self.title or '未命名橫幅'} (排序: {self.order})"
 
+
+# ========================================
+# 網站素材庫 (統一管理全站圖片)
+# ========================================
+class SiteImage(models.Model):
+    """
+    統一管理全站裝飾/行銷用圖片。
+    每張圖片有一個唯一代號 (key)，前端透過代號取得圖片。
+    """
+    GROUP_CHOICES = [
+        ('top_banner', '頂部優惠橫幅'),
+        ('promo', '廣告橫幅'),
+        ('friendly', '安心農產'),
+        ('media', '底部媒體展示'),
+        ('hero', '頂部橫幅背景'),
+        ('other', '其他'),
+    ]
+
+    key = models.CharField(
+        max_length=50, unique=True, verbose_name="圖片代號",
+        help_text="唯一代號，前端用此代號取得圖片 (例如: friendly_01, promo_tart, hero_banner)"
+    )
+    label = models.CharField(max_length=100, verbose_name="說明", help_text="方便辨識的中文說明")
+    group = models.CharField(max_length=20, choices=GROUP_CHOICES, default='other', verbose_name="群組分類")
+    image = models.ImageField(upload_to='site_images/', verbose_name="圖片 (選填)", blank=True, null=True)
+    title = models.CharField(max_length=100, blank=True, verbose_name="標題 (選填)", help_text="若此素材需要搭配標題文字，請在此填寫")
+    description = models.TextField(blank=True, verbose_name="介紹文字 (選填)", help_text="若此素材需要搭配說明文字，請在此填寫")
+
+    # 跳轉設定（四選一，由上往下優先）
+    target_product = models.ForeignKey(
+        'Product', null=True, blank=True, on_delete=models.SET_NULL,
+        verbose_name="① 推薦一般商品",
+        help_text="選擇後，點擊圖片會跳轉到此商品頁面"
+    )
+    target_dessert = models.ForeignKey(
+        'Dessert', null=True, blank=True, on_delete=models.SET_NULL,
+        verbose_name="② 推薦甄點商品",
+        help_text="選擇後，點擊圖片會跳轉到此甄點商品頁面"
+    )
+    LINK_PAGE_CHOICES = [
+        ('', '不跳轉'),
+        ('/products', '商品頁'),
+        ('/desserts', '甜點頁'),
+        ('/news', '最新消息'),
+        ('/varieties', '品種介紹'),
+    ]
+    link_page = models.CharField(
+        max_length=50, blank=True, default='', choices=LINK_PAGE_CHOICES,
+        verbose_name="③ 跳轉到站內頁面",
+        help_text="從下拉選單選擇要跳轉的站內頁面"
+    )
+    custom_link = models.CharField(
+        max_length=500, blank=True, verbose_name="④ 自訂跳轉網址",
+        help_text="若要跳轉到外部網頁 (如 LINE、FB) 或其他頁面，請在此填寫 (例如: https://...)"
+    )
+    alt_text = models.CharField(max_length=100, blank=True, verbose_name="替代文字 (SEO)", help_text="圖片的 alt 說明文字")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="最後更新時間")
+
+    class Meta:
+        ordering = ['group', 'key']
+        verbose_name = "網站素材"
+        verbose_name_plural = "網站素材庫"
+
+    def __str__(self):
+        return f"[{self.get_group_display()}] {self.label} ({self.key})"
+
+
 # 品種表
 class Variety(models.Model):
     name = models.CharField(max_length=100, verbose_name="品種名稱")
