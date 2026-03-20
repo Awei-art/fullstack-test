@@ -54,6 +54,106 @@ const openMiniCart = (e) => {
 
 const isMenuOpen = ref(false)
 const headerRef = ref(null)
+const menuRef = ref(null)
+
+// ===== 手機版判斷 =====
+const isMobile = ref(false)
+const checkMobile = () => {
+    isMobile.value = window.innerWidth <= 900
+}
+
+// ===== 手機版觸控滑動手勢 =====
+const swipeState = ref({
+    isSwiping: false,
+    startX: 0,
+    currentX: 0,
+    startTime: 0,
+})
+const menuTranslateX = ref(-100) // -100 = 完全隱藏, 0 = 完全顯示
+const isSwipeAnimating = ref(false) // 手指拖動中，關閉 CSS transition
+
+// 導覽列寬度（70vw）
+const getMenuWidth = () => window.innerWidth * 0.7
+
+// 螢幕左邊緣的觸發範圍 (px)
+const EDGE_THRESHOLD = 30
+// 決定開/關的臨界比例
+const OPEN_THRESHOLD = 0.3
+// 速度門檻（快甩也能開關）
+const VELOCITY_THRESHOLD = 0.3
+
+const onTouchStart = (e) => {
+    if (window.innerWidth > 900) return // 只在手機版生效
+    const touch = e.touches[0]
+    const x = touch.clientX
+
+    // 情境 1：選單關閉時，只有從左邊緣開始滑才啟動
+    // 情境 2：選單打開時，任何位置都能向左滑關閉
+    if (!isMenuOpen.value && x > EDGE_THRESHOLD) return
+    if (isMenuOpen.value && menuRef.value && menuRef.value.contains(e.target)) {
+        // 手指在選單內部，讓選單內部的捲動正常運作
+        // 只有當手指在選單外部（遮罩）才啟動滑動關閉
+        return
+    }
+
+    swipeState.value = {
+        isSwiping: true,
+        startX: x,
+        currentX: x,
+        startTime: Date.now(),
+    }
+    isSwipeAnimating.value = true
+}
+
+const onTouchMove = (e) => {
+    if (!swipeState.value.isSwiping) return
+    const touch = e.touches[0]
+    swipeState.value.currentX = touch.clientX
+
+    const menuWidth = getMenuWidth()
+    const deltaX = swipeState.value.currentX - swipeState.value.startX
+
+    if (!isMenuOpen.value) {
+        // 向右滑 → 打開（從 -100% 開始）
+        const progress = Math.min(Math.max(deltaX / menuWidth, 0), 1)
+        menuTranslateX.value = -100 + (progress * 100)
+    } else {
+        // 向左滑 → 關閉（從 0% 開始）
+        const progress = Math.min(Math.max(-deltaX / menuWidth, 0), 1)
+        menuTranslateX.value = -(progress * 100)
+    }
+}
+
+const onTouchEnd = () => {
+    if (!swipeState.value.isSwiping) return
+    swipeState.value.isSwiping = false
+    isSwipeAnimating.value = false
+
+    const menuWidth = getMenuWidth()
+    const deltaX = swipeState.value.currentX - swipeState.value.startX
+    const elapsed = (Date.now() - swipeState.value.startTime) / 1000
+    const velocity = Math.abs(deltaX) / elapsed / menuWidth // 歸一化速度
+
+    if (!isMenuOpen.value) {
+        // 判斷是否要打開
+        const progress = deltaX / menuWidth
+        if (progress > OPEN_THRESHOLD || velocity > VELOCITY_THRESHOLD && deltaX > 0) {
+            isMenuOpen.value = true
+            menuTranslateX.value = 0
+        } else {
+            menuTranslateX.value = -100
+        }
+    } else {
+        // 判斷是否要關閉
+        const progress = -deltaX / menuWidth
+        if (progress > OPEN_THRESHOLD || velocity > VELOCITY_THRESHOLD && deltaX < 0) {
+            isMenuOpen.value = false
+            menuTranslateX.value = -100
+        } else {
+            menuTranslateX.value = 0
+        }
+    }
+}
 
 // 🔥 捲動偵測：控制手機版漢堡圖 & Logo 位置動畫
 // 加入滯後 (hysteresis) 防止在臨界點反覆閃爍
@@ -97,10 +197,12 @@ const handleMouseLeave = () => {
 
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value
+    menuTranslateX.value = isMenuOpen.value ? 0 : -100
 }
 
 const closeMenu = () => {
     isMenuOpen.value = false
+    menuTranslateX.value = -100
 }
 
 // 手機版子選單展開（如果是無法點擊的純展開選項）
@@ -148,12 +250,22 @@ const handleClickOutside = (event) => {
 onMounted(() => {
     document.addEventListener('click', handleClickOutside)
     window.addEventListener('scroll', handleScroll, { passive: true })
+    // 觸控手勢事件
+    document.addEventListener('touchstart', onTouchStart, { passive: true })
+    document.addEventListener('touchmove', onTouchMove, { passive: false })
+    document.addEventListener('touchend', onTouchEnd, { passive: true })
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
     handleScroll()
 })
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
     window.removeEventListener('scroll', handleScroll)
+    document.removeEventListener('touchstart', onTouchStart)
+    document.removeEventListener('touchmove', onTouchMove)
+    document.removeEventListener('touchend', onTouchEnd)
+    window.removeEventListener('resize', checkMobile)
 })
 </script>
 
@@ -168,7 +280,15 @@ onUnmounted(() => {
             </h1>
 
             <nav>
-                <ul class="header_menu_wrap" :style="{ display: isMenuOpen ? 'flex' : '' }">
+                <ul class="header_menu_wrap" ref="menuRef"
+                    :style="isMobile ? {
+                        display: (isMenuOpen || menuTranslateX > -100) ? 'flex' : '',
+                        transform: `translateX(${menuTranslateX}%)`,
+                        transition: isSwipeAnimating ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        position: (isMenuOpen || menuTranslateX > -100) ? 'fixed' : '',
+                        top: (isMenuOpen || menuTranslateX > -100) ? '0' : '',
+                        left: (isMenuOpen || menuTranslateX > -100) ? '0' : '',
+                    } : {}">
                     <li class="mobile_menu_logo_item">
                         <NuxtLink to="/" @click="closeMenu">
                             <img src="/images/menu_header.png" alt="田原溫室">
@@ -325,7 +445,12 @@ onUnmounted(() => {
             </button>
 
             <!-- 手機版遮罩：點擊黑色半透明背景可收起導覽列 -->
-            <div v-if="isMenuOpen" class="mobile-overlay" @click="closeMenu"></div>
+            <div v-if="isMenuOpen || menuTranslateX > -100" class="mobile-overlay"
+                :style="{
+                    opacity: (100 + menuTranslateX) / 100 * 0.5,
+                    transition: isSwipeAnimating ? 'none' : 'opacity 0.3s ease',
+                }"
+                @click="closeMenu"></div>
         </div>
     </header>
     

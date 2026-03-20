@@ -684,8 +684,7 @@ nav {
     /* When menu is open */
     .header.mobile-menu-open .header_menu_wrap {
         display: flex;
-        /* Override none */
-        animation: slideInLeft 0.3s ease forwards;
+        /* Override none - position/transform now controlled by JS */
     }
 
     /* 手機版：若在會員中心相關頁面，切換顯示會員選單，隱藏一般選單 */
@@ -807,16 +806,15 @@ nav {
         opacity: 0.9;
     }
 
-    /* Backdrop Overlay - 使用真實 div 取代 ::after，讓點擊可以關閉選單 */
     .mobile-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 1);
         z-index: 999;
-        animation: fadeIn 0.3s ease forwards;
+        /* opacity controlled by JS style binding */
     }
 }
 
