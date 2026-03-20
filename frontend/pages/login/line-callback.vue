@@ -25,12 +25,15 @@ onMounted(async () => {
     const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase
 
     // 將 code 送去後端，由後端向 LINE 交換 token 和個人資料
+    const currentRedirectUri = window.location.origin + '/login/line-callback'
+    
     const response = await $fetch('/auth/line/', {
       baseURL: baseURL,
       method: 'POST',
       body: {
         code: code,
-        state: state
+        state: state,
+        redirect_uri: currentRedirectUri
       }
     })
 

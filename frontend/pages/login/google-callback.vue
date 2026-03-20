@@ -24,11 +24,14 @@ onMounted(async () => {
     const baseURL = process.server ? config.public.apiBase : config.public.apiBaseClient || config.public.apiBase
 
     // 將 code 送去後端，由後端向 Google 交換 token 和個人資料
+    const currentRedirectUri = window.location.origin + '/login/google-callback'
+    
     const response = await $fetch('/auth/google/', {
       baseURL: baseURL,
       method: 'POST',
       body: {
-        code: code
+        code: code,
+        redirect_uri: currentRedirectUri
       }
     })
 

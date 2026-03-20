@@ -122,6 +122,7 @@ class LineLoginView(APIView):
     """
     def post(self, request):
         code = request.data.get('code')
+        redirect_uri = request.data.get('redirect_uri', settings.LINE_CALLBACK_URL)
         if not code:
             return Response({'error': '缺少授權碼'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -130,7 +131,7 @@ class LineLoginView(APIView):
         token_data = {
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': settings.LINE_CALLBACK_URL,
+            'redirect_uri': redirect_uri,
             'client_id': settings.LINE_CHANNEL_ID,
             'client_secret': settings.LINE_CHANNEL_SECRET,
         }
@@ -224,6 +225,7 @@ class GoogleLoginView(APIView):
     """
     def post(self, request):
         code = request.data.get('code')
+        redirect_uri = request.data.get('redirect_uri', settings.GOOGLE_CALLBACK_URL)
         if not code:
             return Response({'error': '缺少授權碼'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -232,7 +234,7 @@ class GoogleLoginView(APIView):
         token_data = {
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': settings.GOOGLE_CALLBACK_URL,
+            'redirect_uri': redirect_uri,
             'client_id': settings.GOOGLE_CLIENT_ID,
             'client_secret': settings.GOOGLE_CLIENT_SECRET,
         }

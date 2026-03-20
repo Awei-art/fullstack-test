@@ -4,15 +4,16 @@ import { reactive, ref, computed, onMounted } from 'vue';
 // 取得 Nuxt 設定（API 網址）
 const config = useRuntimeConfig();
 
-// LINE / Google 快速登入（動態偵測目前網址，不再寫死 localhost）
+// 取得當前的來源網址 (使用 Nuxt3 的 SSR 安全方式)
+const origin = useRequestURL().origin;
+
+// LINE / Google 快速登入（動態偵測目前網址）
 const lineLoginUrl = computed(() => {
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   const redirectUri = encodeURIComponent(`${origin}/login/line-callback`);
   return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=${redirectUri}&state=login_state_123&scope=profile%20openid`;
 });
 
 const googleLoginUrl = computed(() => {
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   const redirectUri = encodeURIComponent(`${origin}/login/google-callback`);
   return `https://accounts.google.com/o/oauth2/v2/auth?client_id=***REMOVED_GOOGLE_CLIENT_ID***&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&access_type=online`;
 });
