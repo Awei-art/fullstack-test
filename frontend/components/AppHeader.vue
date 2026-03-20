@@ -75,8 +75,8 @@ const isSwipeAnimating = ref(false) // 手指拖動中，關閉 CSS transition
 // 導覽列寬度（70vw）
 const getMenuWidth = () => window.innerWidth * 0.7
 
-// 螢幕左邊緣的觸發範圍 (px)
-const EDGE_THRESHOLD = 30
+// 左側觸發範圍（放寬到螢幕左半邊 50% 範圍都能觸發滑出）
+const getEdgeThreshold = () => window.innerWidth * 0.5
 // 決定開/關的臨界比例
 const OPEN_THRESHOLD = 0.3
 // 速度門檻（快甩也能開關）
@@ -87,9 +87,9 @@ const onTouchStart = (e) => {
     const touch = e.touches[0]
     const x = touch.clientX
 
-    // 情境 1：選單關閉時，只有從左邊緣開始滑才啟動
+    // 情境 1：選單關閉時，只要是從「螢幕左半部」開始滑都能啟動，避開 iPhone 邊緣返回手勢
     // 情境 2：選單打開時，任何位置都能向左滑關閉
-    if (!isMenuOpen.value && x > EDGE_THRESHOLD) return
+    if (!isMenuOpen.value && x > getEdgeThreshold()) return
     if (isMenuOpen.value && menuRef.value && menuRef.value.contains(e.target)) {
         // 手指在選單內部，讓選單內部的捲動正常運作
         // 只有當手指在選單外部（遮罩）才啟動滑動關閉
