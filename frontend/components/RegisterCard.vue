@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, nextTick } from 'vue';
 
 // 取得 API 設定
 const config = useRuntimeConfig();
@@ -20,6 +20,10 @@ const form = reactive({
 
 // 錯誤訊息 (API 返回的全局錯誤)
 const errorMessage = ref('');
+
+// 註冊成功狀態
+const isSuccess = ref(false);
+const registeredUsername = ref('');
 
 // 欄位即時驗證錯誤訊息
 const fieldErrors = reactive({
@@ -149,8 +153,14 @@ const handleRegister = async () => {
     if (data.value) {
       console.log('註冊成功:', data.value);
       
-      // 跳轉到登入頁
-      await navigateTo('/login?registered=true');
+      // 顯示成功畫面
+      registeredUsername.value = form.username;
+      isSuccess.value = true;
+
+      // 2.5 秒後自動跳轉到登入頁
+      setTimeout(async () => {
+        await navigateTo('/login');
+      }, 2500);
     }
 
   } catch (err) {
@@ -165,6 +175,22 @@ const handleRegister = async () => {
 <template>
   <div class="login_wrapper">
     <div class="login_card">
+
+      <!-- 註冊成功畫面 -->
+      <div v-if="isSuccess" class="success-screen">
+        <div class="success-checkmark">
+          <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+        <h2 class="success-title">註冊成功！</h2>
+        <p class="success-text">歡迎加入田園溫室，{{ registeredUsername }}</p>
+        <p class="success-redirect">即將為您跳轉至登入頁面...</p>
+      </div>
+
+      <!-- 註冊表單（原始畫面） -->
+      <template v-else>
       <!-- 返回按鈕 -->
       <button @click="goBack" class="back-btn">
         <svg xmlns="http://www.w3.org/2000/svg" class="back-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -268,6 +294,7 @@ const handleRegister = async () => {
         <span>已經有帳號了？</span>
         <NuxtLink to="/login" class="link_highlight">立即登入</NuxtLink>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -292,5 +319,93 @@ const handleRegister = async () => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-3px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== 註冊成功畫面 ========== */
+.success-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  animation: successFadeIn 0.5s ease;
+}
+
+@keyframes successFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.success-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 20px 0 8px;
+  font-weight: 700;
+}
+
+.success-text {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0 0 6px;
+}
+
+.success-redirect {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* 打勾 SVG 動畫 */
+.success-checkmark {
+  width: 72px;
+  height: 72px;
+}
+
+.checkmark-svg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #4bb71b;
+  stroke-miterlimit: 10;
+  animation: checkFill 0.4s ease-in-out 0.4s forwards, checkScale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #4bb71b;
+  fill: none;
+  animation: checkStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-width: 3;
+  animation: checkStroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes checkStroke {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes checkScale {
+  0%, 100% { transform: none; }
+  50% { transform: scale3d(1.1, 1.1, 1); }
+}
+
+@keyframes checkFill {
+  100% { box-shadow: inset 0 0 0 36px rgba(75, 183, 27, 0.08); }
 }
 </style>

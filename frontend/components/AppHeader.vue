@@ -290,12 +290,7 @@ onUnmounted(() => {
                 <!-- 登入後顯示會員頭貼 -->
                 <div v-else class="header-user-wrapper" ref="userMenuRef" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
                     <a href="#" class="btn_login logged-in" @click.prevent="handleUserMenuClick">
-                        <img v-if="userCookie.avatar" :src="userCookie.avatar" alt="User Avatar" class="header-avatar">
-                        <svg v-else class="icon_user" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
-                            stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                        <img :src="userCookie.avatar || '/images/default_avatar.svg'" alt="User Avatar" class="header-avatar">
                         <span class="btn_text user-name desktop-only">{{ userCookie.username || '會員中心' }}</span>
                     </a>
 

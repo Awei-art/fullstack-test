@@ -87,7 +87,7 @@ const fetchMemberData = async () => {
         name: realData.first_name || realData.username, // 優先使用顯示名稱
         level: realData.level || '一般會員',
         joinDate: formatDate(realData.date_joined),
-        avatar: realData.avatar || '/images/default_avatar.png' // 設定預設頭貼
+        avatar: realData.avatar || '/images/default_avatar.svg' // 設定預設頭貼
       };
 
       accountData.value = {

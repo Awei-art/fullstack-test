@@ -7,6 +7,9 @@ const config = useRuntimeConfig();
 // 取得當前的來源網址 (使用 Nuxt3 的 SSR 安全方式)
 const origin = useRequestURL().origin;
 
+// 偵測是否在 WebView（App 內嵌瀏覽器）中
+const isWebView = ref(false);
+
 // LINE / Google 快速登入（動態偵測目前網址）
 const lineLoginUrl = computed(() => {
   const redirectUri = encodeURIComponent(`${origin}/login/line-callback`);
@@ -37,13 +40,17 @@ const errorMessage = ref('');
 // 載入狀態
 const isLoading = ref(false);
 
-// 頁面載入時讀取已記憶的帳號
+// 頁面載入時讀取已記憶的帳號 + 偵測 WebView
 onMounted(() => {
   const savedAccount = localStorage.getItem('saved_account');
   if (savedAccount) {
     form.account = savedAccount;
     form.rememberMe = true;
   }
+
+  // 偵測 WebView：檢查 User Agent 是否包含常見 App 內嵌瀏覽器特徵
+  const ua = navigator.userAgent || '';
+  isWebView.value = /Line\/|FBAN|FBAV|Instagram|Twitter|MicroMessenger|WeChat|wv\)/i.test(ua);
 });
 
 // 登入處理函式
@@ -209,8 +216,8 @@ const handleLogin = async () => {
         <span>使用 LINE 快速登入</span>
       </a>
 
-      <!-- 🔥 新增：Google 登入按鈕 -->
-      <a :href="googleLoginUrl" class="google-login-btn">
+      <!-- Google 登入按鈕（正常瀏覽器顯示）-->
+      <a v-if="!isWebView" :href="googleLoginUrl" class="google-login-btn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" class="google-icon">
           <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
           <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
@@ -219,6 +226,16 @@ const handleLogin = async () => {
         </svg>
         <span>使用 Google 快速登入</span>
       </a>
+
+      <!-- WebView 提示（在 App 內嵌瀏覽器時顯示）-->
+      <div v-else class="webview-hint">
+        <div class="webview-hint-icon">🔒</div>
+        <p class="webview-hint-text">
+          目前您正在 App 內開啟網頁，基於安全限制無法使用 Google 登入。
+          <br/>建議您使用上方的 <strong>LINE 快速登入</strong>，
+          <br/>或點擊右上角選單「<strong>用瀏覽器開啟</strong>」後再試。
+        </p>
+      </div>
 
       <!-- 註冊連結 -->
       <div class="register-section">
@@ -280,5 +297,27 @@ const handleLogin = async () => {
 
 .google-icon {
   margin-right: 10px;
+}
+
+/* WebView 提示樣式 */
+.webview-hint {
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.webview-hint-icon {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+.webview-hint-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #92400e;
+  line-height: 1.6;
 }
 </style>
