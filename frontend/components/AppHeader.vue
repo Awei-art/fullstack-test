@@ -282,12 +282,13 @@ onUnmounted(() => {
             <nav>
                 <ul class="header_menu_wrap" ref="menuRef"
                     :style="isMobile ? {
-                        display: (isMenuOpen || menuTranslateX > -100) ? 'flex' : '',
+                        display: 'flex',
                         transform: `translateX(${menuTranslateX}%)`,
-                        transition: isSwipeAnimating ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                        position: (isMenuOpen || menuTranslateX > -100) ? 'fixed' : '',
-                        top: (isMenuOpen || menuTranslateX > -100) ? '0' : '',
-                        left: (isMenuOpen || menuTranslateX > -100) ? '0' : '',
+                        transition: isSwipeAnimating ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+                        position: 'fixed',
+                        top: '0',
+                        left: '0',
+                        pointerEvents: (isMenuOpen || menuTranslateX > -100) ? 'auto' : 'none'
                     } : {}">
                     <li class="mobile_menu_logo_item">
                         <NuxtLink to="/" @click="closeMenu">
@@ -445,11 +446,13 @@ onUnmounted(() => {
             </button>
 
             <!-- 手機版遮罩：點擊黑色半透明背景可收起導覽列 -->
-            <div v-if="isMenuOpen || menuTranslateX > -100" class="mobile-overlay"
-                :style="{
+            <div class="mobile-overlay"
+                :style="isMobile ? {
+                    display: 'block',
                     opacity: (100 + menuTranslateX) / 100 * 0.5,
-                    transition: isSwipeAnimating ? 'none' : 'opacity 0.3s ease',
-                }"
+                    transition: isSwipeAnimating ? 'none' : 'opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+                    pointerEvents: (isMenuOpen || menuTranslateX > -100) ? 'auto' : 'none'
+                } : { display: 'none' }"
                 @click="closeMenu"></div>
         </div>
     </header>
