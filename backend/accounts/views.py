@@ -338,8 +338,8 @@ class ForgotPasswordView(APIView):
             token = default_token_generator.make_token(user)
             
             # 使用前端網頁重設密碼的入口點
-            # 實務上這裡可以透過環境變數傳入正式網域，目前預設為開發環境
-            front_url = 'http://localhost:3000'
+            # 改由環境變數傳入正式網域以支援 Vercel 與 localhost
+            front_url = settings.FRONTEND_URL.rstrip('/')
             reset_link = f"{front_url}/reset-password?uid={uid}&token={token}"
             
             # 寄送重設信件給客人
