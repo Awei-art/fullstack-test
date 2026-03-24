@@ -31,10 +31,10 @@ export default defineNuxtConfig({
   // API 設定
   runtimeConfig: {
     public: {
-      // 伺服器端 (Docker) 連後端容器
-      apiBase: 'http://backend:8000/api',
-      // 客戶端 (瀏覽器) 連 localhost
-      apiBaseClient: 'http://localhost:8000/api',
+      // 伺服器端 (Docker/Vercel) 連後端 API
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://backend:8000/api',
+      // 客戶端 (瀏覽器) 連後端 API
+      apiBaseClient: process.env.NUXT_PUBLIC_API_BASE_CLIENT || 'http://localhost:8000/api',
       // 第三方登入 Client IDs
       lineChannelId: process.env.LINE_CHANNEL_ID || '',
       googleClientId: process.env.GOOGLE_CLIENT_ID || ''
