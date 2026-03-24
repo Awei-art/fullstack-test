@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '***REMOVED_SECRET_KEY***'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-dev-key-do-not-use-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
@@ -201,13 +201,13 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # LINE Login 設定
-LINE_CHANNEL_ID = os.environ.get('LINE_CHANNEL_ID', '2009217904')
-LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '***REMOVED_LINE_SECRET***')
+LINE_CHANNEL_ID = os.environ.get('LINE_CHANNEL_ID', '')
+LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CALLBACK_URL = os.environ.get('LINE_CALLBACK_URL', 'http://localhost:3000/login/line-callback')
 
 # Google Login 設定
-GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '***REMOVED_GOOGLE_CLIENT_ID***')
-GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '***REMOVED_GOOGLE_SECRET***')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_CALLBACK_URL = os.environ.get('GOOGLE_CALLBACK_URL', 'http://localhost:3000/login/google-callback')
 
 # Email (Gmail) 發信引擎設定
@@ -216,17 +216,17 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # 您的電商信箱
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '***REMOVED_EMAIL***') 
-# 這是您剛剛產生的 16 碼 App Password (中間的空格拿掉)
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '***REMOVED_EMAIL_PASSWORD***')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+# 這是您產生的 16 碼 App Password（請設定在 .env 中）
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = '田原葡萄 <' + EMAIL_HOST_USER + '>'
 
 # ========================================
 # ECPay 綠界金流設定 (測試環境)
 # ========================================
-ECPAY_MERCHANT_ID = os.environ.get('ECPAY_MERCHANT_ID', '3002607')
-ECPAY_HASH_KEY = os.environ.get('ECPAY_HASH_KEY', '***REMOVED_ECPAY_KEY***')
-ECPAY_HASH_IV = os.environ.get('ECPAY_HASH_IV', '***REMOVED_ECPAY_IV***')
+ECPAY_MERCHANT_ID = os.environ.get('ECPAY_MERCHANT_ID', '')
+ECPAY_HASH_KEY = os.environ.get('ECPAY_HASH_KEY', '')
+ECPAY_HASH_IV = os.environ.get('ECPAY_HASH_IV', '')
 ECPAY_PAYMENT_URL = os.environ.get('ECPAY_PAYMENT_URL', 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5')
 # 前端網址 (付款完成後跳回)
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
