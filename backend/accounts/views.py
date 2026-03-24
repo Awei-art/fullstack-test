@@ -218,6 +218,10 @@ class LineLoginView(APIView):
             'avatar': user.avatar,
         }, status=status.HTTP_200_OK)
 
+
+# ========================================
+# Google 登入 API
+# ========================================
 class GoogleLoginView(APIView):
     """
     Google 登入 API
@@ -314,6 +318,9 @@ class GoogleLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+# ========================================
+# 忘記密碼 API
+# ========================================
 class ForgotPasswordView(APIView):
     """
     忘記密碼 API (向信箱寄發重設連結)
@@ -355,6 +362,9 @@ class ForgotPasswordView(APIView):
         return Response({'message': '重設密碼信件已寄出（若您輸入的信箱註冊過本網站的話）'}, status=status.HTTP_200_OK)
 
 
+# ========================================
+# 重設密碼 API
+# ========================================
 class ResetPasswordView(APIView):
     """
     重設密碼驗證 API (核對鑰匙並真正改寫密碼)
@@ -427,6 +437,10 @@ class UserAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         # 修改地址的處理
         serializer.save()
 
+
+# ========================================
+# 修改密碼 API
+# ========================================
 class ChangePasswordView(APIView):
     """
     登入會員獨立的修改密碼頁面專用 API

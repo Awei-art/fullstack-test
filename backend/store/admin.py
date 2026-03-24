@@ -116,7 +116,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 # ========================================
-# 甄點管理
+# 甜點管理
 # ========================================
 
 @admin.register(DessertCategory)

@@ -497,7 +497,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
 
 # ========================================
-# 甄點 Serializers
+# 甜點 Serializers
 # ========================================
 
 class DessertCategorySerializer(serializers.ModelSerializer):

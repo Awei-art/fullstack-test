@@ -36,11 +36,11 @@ class VarietyListView(generics.ListAPIView):
 
 
 # ========================================
-# 甄點 API
+# 甜點 API
 # ========================================
 
 class DessertCategoryListView(generics.ListAPIView):
-    """GET /api/desserts/categories/ — 甄點分類列表"""
+    """GET /api/desserts/categories/ — 甜點分類列表"""
     serializer_class = DessertCategorySerializer
     permission_classes = [AllowAny]
     queryset = DessertCategory.objects.filter(is_active=True)
@@ -356,9 +356,7 @@ class ECPayReturnView(APIView):
         })
 
 
-# ========================================
-# 優惠券 API
-# ========================================
+
 # ========================================
 # 優惠券 API
 # ========================================

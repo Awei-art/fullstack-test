@@ -5,6 +5,9 @@ from django.contrib.auth.models import AbstractUser
 #自訂使用者模型
 from django.db import models
 
+# ========================================
+# 會員系統
+# ========================================
 class User(AbstractUser):
     """
     自訂使用者模型
@@ -75,7 +78,7 @@ class UserAddress(models.Model):
         return f"{self.user.username} - {label}{self.receiver_name} ({self.city}{self.district})"
 
     def save(self, *args, **kwargs):
-        # 【超強防呆機制】如果這筆地址被設為「預設」，系統自動去把這位客人的「其他所有地址」的預設取消掉
+        # 【防呆機制】如果這筆地址被設為「預設」，系統自動去把這位客人的「其他所有地址」的預設取消掉
         # 確保一位客人永遠只會有一個預設地址！
         if self.is_default:
             UserAddress.objects.filter(user=self.user).exclude(pk=self.pk).update(is_default=False)

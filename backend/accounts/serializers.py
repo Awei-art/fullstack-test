@@ -1,6 +1,10 @@
 from rest_framework import serializers
 import re
-from .models import User, UserLoginRecord, UserAddress, UserAddress
+from .models import User, UserLoginRecord, UserAddress
+
+# ========================================
+# 會員系統 Serializers
+# ========================================
 
 class UserLoginRecordSerializer(serializers.ModelSerializer):
     class Meta:

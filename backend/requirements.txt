@@ -9,3 +9,6 @@ whitenoise>=6.5,<7.0
 requests>=2.31,<3.0
 cloudinary>=1.39.0
 dj3-cloudinary-storage>=0.0.6
+pytest>=8.0
+pytest-django>=4.8
+factory-boy>=3.3

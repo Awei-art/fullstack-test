@@ -88,7 +88,9 @@ class SiteImage(models.Model):
         return f"[{self.get_group_display()}] {self.label} ({self.key})"
 
 
-# 品種表
+# ========================================
+# 葡萄品種表
+# ========================================
 class Variety(models.Model):
     name = models.CharField(max_length=100, verbose_name="品種名稱")
     color = models.CharField(max_length=50, verbose_name="顏色")
@@ -111,8 +113,9 @@ class Variety(models.Model):
         return self.name
 
 
-
+# ========================================
 # 商品分類表
+# ========================================
 class ProductCategory(models.Model):
     """商品分類（單品種禮盒、混搭禮盒、季節限定等）"""
     name = models.CharField(max_length=100, verbose_name="分類名稱")
@@ -127,8 +130,9 @@ class ProductCategory(models.Model):
     def __str__(self):
         return self.name
 
-
-# ---  葡萄商品表 ---
+# ========================================
+# 葡萄商品表
+# ========================================
 class Product(models.Model):
     # 0. 商品分類
     category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products', verbose_name="商品分類")
@@ -205,7 +209,9 @@ class Product(models.Model):
 
 
 
-# 規格資料表 (各等級 價格 庫存)
+# ========================================
+# 葡萄規格資料表 (各等級 價格 庫存)
+# ========================================
 class ProductGrade(models.Model):
     product = models.ForeignKey(
         Product, 
@@ -235,7 +241,9 @@ class ProductGrade(models.Model):
 
 
 
-# 「詳細頁」的多張照片  
+# ========================================
+# 葡萄商品多張照片
+# ========================================
 class ProductImage(models.Model):
     # 1. 關聯：把這張照片綁定到某個商品 (Product)
     # related_name='images' 很重要，這讓我們以後可以用 product.images 抓到所有照片
@@ -293,6 +301,7 @@ class Coupon(models.Model):
     def is_valid(self, order_subtotal):
         """檢查此優惠券目前是否可用"""
         from django.utils import timezone
+        order_subtotal = int(order_subtotal)  # 👈 加這行，確保是數字
         now = timezone.now()
         
         if not self.is_active:
@@ -310,6 +319,8 @@ class Coupon(models.Model):
 
     def calculate_discount(self, subtotal, shipping_fee=0):
         """計算折抵金額"""
+        subtotal = int(subtotal)
+        shipping_fee = int(shipping_fee)
         if self.discount_type == 'fixed':
             return min(int(self.discount_value), subtotal) 
         elif self.discount_type == 'percent':
@@ -475,6 +486,9 @@ class Order(models.Model):
         return f"{prefix}{new_seq:03d}"
 
 
+# ========================================
+# 訂單明細
+# ========================================
 class OrderItem(models.Model):
     """
     訂單明細：每一筆品項（一個訂單可以有多個品項）
@@ -563,6 +577,9 @@ class NewsCategory(models.Model):
         return self.name
 
 
+# ========================================
+# 最新消息頁
+# ========================================
 class News(models.Model):
     """最新消息"""
     category = models.ForeignKey(
@@ -592,7 +609,7 @@ class News(models.Model):
 
 
 # ========================================
-# 甜點系統
+# 甜點分類
 # ========================================
 
 class DessertCategory(models.Model):
@@ -612,6 +629,9 @@ class DessertCategory(models.Model):
         return self.name
 
 
+# ========================================
+# 甜點品項
+# ========================================
 class Dessert(models.Model):
     """個別甜點品項（如草莓大福、水蜜桃大福）"""
     category = models.ForeignKey(DessertCategory, on_delete=models.CASCADE, related_name='desserts', verbose_name="所屬分類")
@@ -634,6 +654,10 @@ class Dessert(models.Model):
     def __str__(self):
         return f"{self.name}（{self.category.name}）"
 
+
+# ========================================
+# 甜點規格
+# ========================================
 class DessertGrade(models.Model):
     """甜點規格/等級 (例如：6顆裝 $480, 9顆裝 $720)"""
     dessert = models.ForeignKey(
@@ -656,6 +680,9 @@ class DessertGrade(models.Model):
         return f"{self.dessert.name} - {self.name} (NT${self.price})"
 
 
+# ========================================
+# 甜點多張照片
+# ========================================
 class DessertImage(models.Model):
     """甜點詳細頁的多張照片（跟葡萄的 ProductImage 一樣）"""
     dessert = models.ForeignKey(

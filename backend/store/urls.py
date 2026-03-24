@@ -27,7 +27,7 @@ urlpatterns = [
     # 品種介紹 API
     path('varieties/', VarietyListView.as_view(), name='variety-list'),
 
-    # 甄點 API
+    # 甜點 API
     path('desserts/categories/', DessertCategoryListView.as_view(), name='dessert-category-list'),
     path('desserts/', DessertListView.as_view(), name='dessert-list'),
     path('desserts/<int:pk>/', DessertDetailView.as_view(), name='dessert-detail'),
