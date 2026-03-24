@@ -121,6 +121,8 @@ services:
     environment:
       - NUXT_PUBLIC_API_BASE=http://backend:8000/api
       - WATCHPACK_POLLING=true
+      - LINE_CHANNEL_ID=${LINE_CHANNEL_ID}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     ports:
       - "3000:3000"
     volumes:

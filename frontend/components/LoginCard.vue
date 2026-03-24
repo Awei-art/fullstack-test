@@ -13,12 +13,12 @@ const isWebView = ref(false);
 // LINE / Google 快速登入（動態偵測目前網址）
 const lineLoginUrl = computed(() => {
   const redirectUri = encodeURIComponent(`${origin}/login/line-callback`);
-  return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2009217904&redirect_uri=${redirectUri}&state=login_state_123&scope=profile%20openid`;
+  return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${config.public.lineChannelId}&redirect_uri=${redirectUri}&state=login_state_123&scope=profile%20openid`;
 });
 
 const googleLoginUrl = computed(() => {
   const redirectUri = encodeURIComponent(`${origin}/login/google-callback`);
-  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=***REMOVED_GOOGLE_CLIENT_ID***&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&access_type=online`;
+  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${config.public.googleClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&access_type=online`;
 });
 
 // 路由控制 (返回首頁)

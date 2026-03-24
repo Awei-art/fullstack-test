@@ -34,7 +34,10 @@ export default defineNuxtConfig({
       // 伺服器端 (Docker) 連後端容器
       apiBase: 'http://backend:8000/api',
       // 客戶端 (瀏覽器) 連 localhost
-      apiBaseClient: 'http://localhost:8000/api'
+      apiBaseClient: 'http://localhost:8000/api',
+      // 第三方登入 Client IDs
+      lineChannelId: process.env.LINE_CHANNEL_ID || '',
+      googleClientId: process.env.GOOGLE_CLIENT_ID || ''
     }
   }
 })
