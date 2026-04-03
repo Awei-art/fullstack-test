@@ -188,6 +188,7 @@ const addToCart = (dessert) => {
                                     :src="getImageUrl(d.image) || getPlaceholder(i)" 
                                     :alt="d.name" 
                                     class="dessert_card_img"
+                                    loading="lazy"
                                 >
                             </NuxtLink>
                             <span class="dessert_card_flavor_badge" :style="{ backgroundColor: getFlavorColor(d.flavor) }">

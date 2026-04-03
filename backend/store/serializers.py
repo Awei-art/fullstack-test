@@ -81,9 +81,17 @@ class VarietyDetailSerializer(serializers.ModelSerializer):
 
 # 小圖片的 Serializer
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'order']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 # 等級規格 Serializer
@@ -520,9 +528,17 @@ class DessertGradeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'count', 'price', 'stock']
 
 class DessertImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = DessertImage
         fields = ['id', 'image', 'order']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 class DessertSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()

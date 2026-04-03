@@ -21,6 +21,28 @@ const { data: product, pending } = await useFetch(`/products/${route.params.id}/
   baseURL: baseURL
 })
 
+// 處理圖片路徑 (解決 SSR 與上線部署後的路徑問題，包含 Cloudinary 加速)
+const getImageUrl = (url) => {
+    if (!url) return null
+
+    // Cloudinary 優化：自動壓縮與轉成 WebP
+    if (typeof url === 'string' && url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
+        if (!url.includes('f_auto') && !url.includes('q_auto')) {
+            url = url.replace('/image/upload/', '/image/upload/f_auto,q_auto/')
+        }
+    }
+
+    const clientBaseUrl = config.public.apiBaseClient.replace(/\/api\/?$/, '')
+
+    if (url.startsWith('http://backend:8000')) {
+        return url.replace('http://backend:8000', clientBaseUrl)
+    }
+    if (url.startsWith('/media/')) {
+        return `${clientBaseUrl}${url}`
+    }
+    return url
+}
+
 // ==========================================
 // 圖片處理邏輯
 // ==========================================
@@ -29,12 +51,12 @@ const galleryImages = computed(() => {
   const list = []
   
   // 1. 封面圖
-  if (product.value.image) list.push(product.value.image)
+  if (product.value.image) list.push(getImageUrl(product.value.image))
   
   // 2. 相簿圖 (後端回傳的是物件陣列，要取出 image 欄位)
   if (product.value.images && product.value.images.length > 0) {
     product.value.images.forEach(imgObj => {
-      list.push(imgObj.image)
+      list.push(getImageUrl(imgObj.image))
     })
   }
   
@@ -260,12 +282,8 @@ const addToCart = (skipOpen = false) => {
   if (isSoldOut.value || selectedVarieties.value.length < limit) return
 
 
-  // 🔥 解決圖片路徑問題：如果是 /media 開頭，補上後端 API 網址
-  const backendUrl = 'http://127.0.0.1:8000'
-  let safeImage = product.value.image || '/images/default-grape.png'
-  if (safeImage.startsWith('/media')) {
-    safeImage = backendUrl + safeImage
-  }
+  // 🔥 解決圖片路徑問題：用 getImageUrl 統一處理
+  let safeImage = getImageUrl(product.value.image) || '/images/default-grape.png'
   // 1. 整理要存進購物車的資料
   const cartItem = {
     itemType: 'product',
@@ -348,7 +366,7 @@ const breadcrumbs = computed(() => {
             :class="{ active: currentImage === img }"
             @click="changeImage(img)"
           >
-            <img :src="img" :alt="'Thumb ' + (index + 1)" class="thumb_img">
+            <img :src="img" :alt="'Thumb ' + (index + 1)" class="thumb_img" loading="lazy">
           </div>
         </div>
       </div>

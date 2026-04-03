@@ -775,5 +775,40 @@ const checkout = () => {
     position: static; /* 手機版不黏貼 */
     margin-top: 20px;
   }
+
+  /* 手機版：縮小圖片，讓文字有更多空間 */
+  .item_image_col {
+    width: 80px;
+    margin-right: 14px;
+  }
+
+  /* 讓 info 欄不會把價格推出畫面 */
+  .item_info_col {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .item_title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item_variant {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* 價格欄位：不被壓縮、一定顯示 */
+  .item_price_col {
+    min-width: 75px;
+    flex-shrink: 0;
+  }
+
+  .price_text {
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
 }
 </style>

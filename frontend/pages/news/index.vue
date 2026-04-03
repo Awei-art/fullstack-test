@@ -110,6 +110,7 @@ const formatDate = (dateStr) => {
                             :src="getImageUrl(item.cover_image)" 
                             :alt="item.title" 
                             class="news_item_img"
+                            loading="lazy"
                         >
                         <div v-else class="news_item_img_placeholder">
                             <i class="fas fa-image"></i>

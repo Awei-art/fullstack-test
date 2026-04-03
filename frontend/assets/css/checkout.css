@@ -487,7 +487,6 @@
     .checkout_right {
         width: 100%;
         position: static;
-        order: -1;
         margin-bottom: 20px;
     }
 

@@ -26,6 +26,13 @@ const galleryImages = computed(() => {
 
   // 修正圖片 URL 的通用函式
   const fixUrl = (url) => {
+    // Cloudinary 優化：自動壓縮與轉成 WebP
+    if (typeof url === 'string' && url.includes('res.cloudinary.com') && url.includes('/image/upload/')) {
+        if (!url.includes('f_auto') && !url.includes('q_auto')) {
+            url = url.replace('/image/upload/', '/image/upload/f_auto,q_auto/')
+        }
+    }
+
     if (url.startsWith('http://backend:8000')) {
       return url.replace('http://backend:8000', clientBaseUrl)
     } else if (url.startsWith('/media/')) {
@@ -224,7 +231,7 @@ const breadcrumbs = computed(() => {
             :class="{ active: currentImage === img }"
             @click="changeImage(img)"
           >
-            <img :src="img" :alt="'Thumb ' + (index + 1)" class="thumb_img">
+            <img :src="img" :alt="'Thumb ' + (index + 1)" class="thumb_img" loading="lazy">
           </div>
         </div>
       </div>

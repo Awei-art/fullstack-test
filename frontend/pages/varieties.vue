@@ -98,7 +98,7 @@ const getColorCss = (colorName) => {
 
                             <!-- 通用的圓形裁切與圖片 -->
                             <div class="variety_card_img_wrap">
-                                <img :src="getImageUrl(v.image) || getPlaceholder(i)" :alt="v.name" class="variety_card_img">
+                                <img :src="getImageUrl(v.image) || getPlaceholder(i)" :alt="v.name" class="variety_card_img" loading="lazy">
                             </div>
 
                             <div class="variety_card_body">
