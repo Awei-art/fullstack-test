@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { useRouter } from 'vue-router'
 
@@ -10,6 +10,27 @@ const isMiniCartOpen = computed(() => cartStore.isMiniCartOpen)
 const cartItems = computed(() => cartStore.items)
 const subtotal = computed(() => cartStore.totalPrice)
 const totalQuantity = computed(() => cartStore.totalQty)
+
+// 小購物車打開時，鎖定背景滾動（iOS Safari 需要 position: fixed）
+let savedScrollY = 0
+watch(isMiniCartOpen, (open) => {
+  if (!process.client) return
+  if (open) {
+    savedScrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${savedScrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.position = ''
+    document.body.style.top = ''
+    document.body.style.left = ''
+    document.body.style.right = ''
+    document.body.style.overflow = ''
+    window.scrollTo(0, savedScrollY)
+  }
+})
 
 // 關閉小購物車
 const closeCart = () => {
@@ -132,8 +153,9 @@ const decreaseQty = (item) => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: transparent; /* 背景不用變黑 */
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 1000;
+  touch-action: none;
 }
 
 /* 側邊菜單主體 */

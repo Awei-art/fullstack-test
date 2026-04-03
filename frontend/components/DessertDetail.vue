@@ -13,7 +13,9 @@ const baseURL = process.server ? config.public.apiBase : config.public.apiBaseCl
 
 // 呼叫後端 API
 const { data: dessert, pending } = await useFetch(`/desserts/${route.params.id}/`, {
-  baseURL: baseURL
+  baseURL: baseURL,
+  key: `dessert-detail-${route.params.id}`,
+  lazy: true
 })
 
 // ==========================================

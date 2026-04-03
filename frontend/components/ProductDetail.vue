@@ -18,7 +18,9 @@ const baseURL = process.server ? config.public.apiBase : config.public.apiBaseCl
 
 // 2. 呼叫後端 API
 const { data: product, pending } = await useFetch(`/products/${route.params.id}/`, {
-  baseURL: baseURL
+  baseURL: baseURL,
+  key: `product-detail-${route.params.id}`,
+  lazy: true
 })
 
 // 處理圖片路徑 (解決 SSR 與上線部署後的路徑問題，包含 Cloudinary 加速)

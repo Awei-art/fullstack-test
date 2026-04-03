@@ -586,7 +586,7 @@ onUnmounted(() => {
 
     /* 放大手機版的購物車與頭像圖示 */
     .btn_cart {
-        margin-right: 15px; /* 控制購物車向左退 (數字越大退越多) */
+        margin-right: 5px;
     }
 
     .btn_cart svg {
